@@ -73,7 +73,7 @@ void PF_table::paintEvent(QPaintEvent *event)
     QRectF rect = QRectF(-__widget_size__/2+__scale_pan__,-__widget_size__/2+__scale_pan__,
                          __widget_size__-2*__scale_pan__,__widget_size__-2*__scale_pan__);
 
-    painter.drawArc(rect,(-startAngle+90)*16,-spanAngle*16);
+    painter.drawArc(rect,-startAngle*16,spanAngle*16);
 
     // markers
     painter.save();

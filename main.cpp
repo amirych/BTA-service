@@ -12,5 +12,7 @@ int main(int argc, char *argv[])
 
     pp.show();
 
+    pp.setNewPos(310);
+
     return a.exec();
 }
