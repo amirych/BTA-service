@@ -2,6 +2,8 @@
 #define PF_TABLE_H
 
 #include <QWidget>
+#include <QSize>
+#include <QSizePolicy>
 
 #define __widget_size__  200
 #define __scale_pan__  35
@@ -21,17 +23,23 @@ public:
     explicit PF_table(QWidget *parent = nullptr);
     PF_table(const double init_pos, QWidget *parent = nullptr);
 
+    QSize sizeHint() const;
+    QSizePolicy sizePolicy() const;
 signals:
+    void tableIsRotating();
+    void newPosHasReached(double pos);
 
 public slots:
     void setNewPos(const double new_pos);
     void changePos();
 
-    void paintEvent(QPaintEvent *event);
+//    void paintEvent(QPaintEvent *event);
 
 private:
     void drawTable();
+    bool eventFilter(QObject *watched, QEvent *event);
 
+    QWidget *main_widget;
     double currentPos, newPos;
 
     int startAngle, stopAngle, spanAngle;

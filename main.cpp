@@ -5,14 +5,14 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-//    BTA_service w;
-//    w.show();
+    BTA_service w;
+    w.show();
 
-    PF_table pp(210);
+//    PF_table pp(210);
 
-    pp.show();
+//    pp.show();
 
-    pp.setNewPos(310);
+//    pp.setNewPos(310);
 
     return a.exec();
 }

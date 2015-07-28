@@ -19,3 +19,9 @@ SOURCES += main.cpp\
 
 HEADERS  += bta_service.h \
     pf_table.h
+
+unix:CONFIG(release,release|debug) LIBS += -L$$PWD/../build-fits_viewer-QT5-Release/ -lfits_viewer
+unix:CONFIG(debug,release|debug) LIBS += -L$$PWD/../build-fits_viewer-QT5-Debug/ -lfits_viewer
+
+INCLUDEPATH += $$PWD/../fits_viewer
+DEPENDPATH += $$PWD/../fits_viewer
