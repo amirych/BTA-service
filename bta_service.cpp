@@ -14,7 +14,7 @@
 
 #include <QStringList>
 
-static QStringList expTypeItems = QStringList({"obj","bias","flat"});
+static QStringList expTypeItems = QStringList({"obj","bias","dark","rotation"});
 static QStringList binValues = QStringList({"1","2","3","4","5"});
 
 
@@ -25,6 +25,7 @@ BTA_service::BTA_service(QWidget *parent)
     : QMainWindow(parent)
 {
     setupUI();
+
 }
 
 BTA_service::~BTA_service()
@@ -96,30 +97,34 @@ void BTA_service::setupUI()
 
     // object name
 
-    QHBoxLayout *obj_layout = new QHBoxLayout(current_file_root_widget);
-    obj_name_label = new QLabel("object ",current_file_root_widget);
+    QWidget *obj_widget = new QWidget(current_file_root_widget);
+    QHBoxLayout *obj_layout = new QHBoxLayout(obj_widget);
+    obj_layout->setMargin(0);
+    obj_name_label = new QLabel("object ",obj_widget);
     obj_name_label->resize(label_width,obj_name_label->height());
-    obj_name_input_field = new QLineEdit(current_file_root_widget);
+    obj_name_input_field = new QLineEdit(obj_widget);
     obj_layout->addWidget(obj_name_label);
     obj_layout->addWidget(obj_name_input_field);
 
-    current_file_layout->addLayout(obj_layout);
+    current_file_layout->addWidget(obj_widget);
 
     // seeing and clouds
 
-    QHBoxLayout *seeing_layout = new QHBoxLayout(current_file_root_widget);
-    seeing_label = new QLabel("seeing",current_file_root_widget);
-    seeing_input_field = new QLineEdit(current_file_root_widget);
+    QWidget *seeing_widget = new QWidget(current_file_root_widget);
+    QHBoxLayout *seeing_layout = new QHBoxLayout(seeing_widget);
+    seeing_layout->setMargin(0);
+    seeing_label = new QLabel("seeing",seeing_widget);
+    seeing_input_field = new QLineEdit(seeing_widget);
     seeing_input_field->setMaximumWidth(50);
     seeing_input_field->setAlignment(Qt::AlignRight);
-    QDoubleValidator *seeing_val = new QDoubleValidator(0.0,20.0,1,current_file_root_widget);
+    QDoubleValidator *seeing_val = new QDoubleValidator(0.0,20.0,1,seeing_widget);
     seeing_input_field->setValidator(seeing_val);
 
     QSpacerItem *seeing_space = new QSpacerItem(30,10);
-    clouds_label = new QLabel("clouds%",current_file_root_widget);
-    clouds_input_field = new QLineEdit(current_file_root_widget);
+    clouds_label = new QLabel("clouds%",seeing_widget);
+    clouds_input_field = new QLineEdit(seeing_widget);
     clouds_input_field->setAlignment(Qt::AlignRight);
-    QDoubleValidator *clouds_val = new QDoubleValidator(0.0,100.0,1,current_file_root_widget);
+    QDoubleValidator *clouds_val = new QDoubleValidator(0.0,100.0,1,seeing_widget);
     clouds_input_field->setValidator(clouds_val);
 
     seeing_layout->addWidget(seeing_label);
@@ -128,39 +133,45 @@ void BTA_service::setupUI()
     seeing_layout->addWidget(clouds_label);
     seeing_layout->addWidget(clouds_input_field);
 
-    current_file_layout->addLayout(seeing_layout);
+    current_file_layout->addWidget(seeing_widget);
 
     // comment field
 
-    QHBoxLayout *comment_layout = new QHBoxLayout(current_file_root_widget);
-    comment_label = new QLabel("comment",current_file_root_widget);
-    comment_input_field = new QLineEdit(current_file_root_widget);
+    QWidget *comment_widget = new QWidget(current_file_root_widget);
+    QHBoxLayout *comment_layout = new QHBoxLayout(comment_widget);
+    comment_layout->setMargin(0);
+    comment_label = new QLabel("comment",comment_widget);
+    comment_input_field = new QLineEdit(comment_widget);
     comment_layout->addWidget(comment_label);
     comment_layout->addWidget(comment_input_field);
 
-    current_file_layout->addLayout(comment_layout);
+    current_file_layout->addWidget(comment_widget);
 
     // current path
 
-    QHBoxLayout *current_path_layout = new QHBoxLayout(current_file_root_widget);
-    current_path_label = new QLabel("path",current_file_root_widget);
-    current_path_input_field = new QLineEdit(current_file_root_widget);
-    current_path_create_button = new QPushButton("create",current_file_root_widget);
+    QWidget *current_path_widget = new QWidget(current_file_root_widget);
+    QHBoxLayout *current_path_layout = new QHBoxLayout(current_path_widget);
+    current_path_layout->setMargin(0);
+    current_path_label = new QLabel("path",current_path_widget);
+    current_path_input_field = new QLineEdit(current_path_widget);
+    current_path_create_button = new QPushButton("create",current_path_widget);
     current_path_layout->addWidget(current_path_label);
     current_path_layout->addWidget(current_path_input_field);
     current_path_layout->addWidget(current_path_create_button);
 
-    current_file_layout->addLayout(current_path_layout);
+    current_file_layout->addWidget(current_path_widget);
 
     // current filename
 
-    QHBoxLayout *file_layout = new QHBoxLayout(current_file_root_widget);
-    current_file_label = new QLabel("file",current_file_root_widget);
-    current_file_input_field = new QLineEdit(current_file_root_widget);
+    QWidget *file_widget = new QWidget(current_file_root_widget);
+    QHBoxLayout *file_layout = new QHBoxLayout(file_widget);
+    file_layout->setMargin(0);
+    current_file_label = new QLabel("file",file_widget);
+    current_file_input_field = new QLineEdit(file_widget);
     QSpacerItem *file_space = new QSpacerItem(30,10);
-    Nexp_label = new QLabel("N exp",current_file_root_widget);
+    Nexp_label = new QLabel("N exp",file_widget);
 
-    Nexp_input_field = new QLineEdit(current_file_root_widget);
+    Nexp_input_field = new QLineEdit(file_widget);
     str = QString(BTA_SERVICE_NEXP_MAX_DIGITS+1,'0');
     dw = fnm.width(str);
     Nexp_input_field->setMaximumWidth(dw);
@@ -176,16 +187,14 @@ void BTA_service::setupUI()
     file_layout->addWidget(Nexp_label);
     file_layout->addWidget(Nexp_input_field);
 
-    current_file_layout->addLayout(file_layout);
+    current_file_layout->addWidget(file_widget);
 
     // auto increment
 
-    QHBoxLayout *auto_inc_layout = new QHBoxLayout(current_file_root_widget);
     auto_increment_check = new QCheckBox("auto increment file",current_file_root_widget);
-    auto_inc_layout->addWidget(auto_increment_check);
     auto_increment_check->setCheckState(Qt::Checked);
 
-    current_file_layout->addLayout(auto_inc_layout);
+    current_file_layout->addWidget(auto_increment_check);
 
 
         /*  frame type, its geometry and exposure control */
@@ -332,8 +341,8 @@ void BTA_service::setupUI()
 
 
     file_exp_layout->setMargin(0);
-    file_exp_layout->addWidget(current_file_root_widget);
-    file_exp_layout->addWidget(current_exp_root_widget);
+    file_exp_layout->addWidget(current_file_root_widget,1);
+    file_exp_layout->addWidget(current_exp_root_widget,1);
 
 
         /*  Log window  */
@@ -429,8 +438,18 @@ void BTA_service::setupUI()
 
     QWidget *pf_table_controls_widget = new QWidget(pf_table_inner_widget);
     QFormLayout *pf_table_controls_layout = new QFormLayout(pf_table_controls_widget);
+    pf_table_controls_layout->setMargin(0);
 
-    pf_table_widget = new PF_table(220.0,pf_table_inner_widget);
+    QFrame *ff = new QFrame(pf_table_inner_widget);
+    ff->setFrameShape(QFrame::Box);
+    ff->setFrameShadow(QFrame::Plain);
+    ff->setStyleSheet("background-color: white");
+    QSizePolicy pp(QSizePolicy::Preferred,QSizePolicy::Preferred);
+    pp.setHeightForWidth(true);
+    ff->setSizePolicy(pp);
+
+//    pf_table_widget = new PF_table(220.0,pf_table_inner_widget);
+    pf_table_widget = new PF_table(220.0,ff);
 
     pf_table_current_input_field = new QLineEdit(pf_table_controls_widget);
     pf_table_current_input_field->setAlignment(Qt::AlignRight);
@@ -472,15 +491,16 @@ void BTA_service::setupUI()
     pf_table_step_input_field->setEnabled(false);
     pf_table_controls_layout->labelForField(pf_table_step_input_field)->setEnabled(false);
 
-    pf_table_inner_layout->addWidget(pf_table_widget);
-    pf_table_inner_layout->addWidget(pf_table_controls_widget);
+//    pf_table_inner_layout->addWidget(pf_table_widget,10);
+    pf_table_inner_layout->addWidget(ff,10);
+    pf_table_inner_layout->addWidget(pf_table_controls_widget,7);
 
     pf_table_label = new QLabel("<b>PF table control</b>",pf_table_root_widget);
 
     pf_table_layout->addWidget(pf_table_label,0,Qt::AlignHCenter);
     pf_table_layout->addWidget(pf_table_inner_widget);
 
-    shift_table_layout->addWidget(pf_table_root_widget,3);
+    shift_table_layout->addWidget(pf_table_root_widget,2);
 
 
     left_panel_layout->addWidget(file_exp_widget);
@@ -490,4 +510,5 @@ void BTA_service::setupUI()
 
 
                         /*      RIGHT PANEL      */
+
 }

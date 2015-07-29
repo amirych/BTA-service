@@ -36,9 +36,11 @@ private:
 
     void setupUI();
 
-    /*     GUI elements    */
+                /*     GUI ELEMENTS    */
 
     QFrame *central_widget;
+
+            /*  left panel  */
 
     // current file and exposure control
     QFrame *current_file_root_widget;
@@ -116,6 +118,26 @@ private:
     QLineEdit *pf_table_stop_input_field;
 
     QPushButton *pf_table_rotation_button;
+
+
+            /*  right panel  */
+
+    // FITS file viewer controls
+    QLabel *FITS_filename_label;
+    Fits_viewer *fits_viewer_widget;
+    QPushButton *load_file_button;
+    QLabel *current_pixel_coords_label;
+    QLabel *current_pixel_value_label;
+    QPushButton *plot_region_button;
+    QPushButton *region_stat_button;
+    QPushButton *seeing_button;
+    QLabel *psf_coords_label;
+    QLabel *psf_fwhm_label;
+
+    // image zoom and data reduction controls
+    Fits_viewer *zoom_widget;
+    QLabel *data_reduc_label;
+    QFrame *axis_calc_root_widget;
 
 };
 

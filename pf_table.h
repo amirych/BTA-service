@@ -25,6 +25,10 @@ public:
 
     QSize sizeHint() const;
     QSizePolicy sizePolicy() const;
+
+//    int heightForWidth(int w) const;
+//    bool hasHeightForWidth() const;
+
 signals:
     void tableIsRotating();
     void newPosHasReached(double pos);
@@ -33,15 +37,19 @@ public slots:
     void setNewPos(const double new_pos);
     void changePos();
 
-//    void paintEvent(QPaintEvent *event);
+    void paintEvent(QPaintEvent *event);
+
+protected:
+    void resizeEvent(QResizeEvent *event);
 
 private:
     void drawTable();
-    bool eventFilter(QObject *watched, QEvent *event);
+//    bool eventFilter(QObject *watched, QEvent *event);
+
 
     QWidget *main_widget;
-    double currentPos, newPos;
 
+    double currentPos, newPos;
     int startAngle, stopAngle, spanAngle;
 };
 
