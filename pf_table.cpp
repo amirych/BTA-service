@@ -49,27 +49,27 @@ PF_table::PF_table(QWidget *parent) : PF_table(220.0,parent)
 //}
 
 
-//int PF_table::heightForWidth(int w) const
-//{
-//    return w;
-//}
-
-
-void PF_table::resizeEvent(QResizeEvent *event)
+int PF_table::heightForWidth(int w) const
 {
-
-    QSize main_widget_geometry = this->size();
-
-    if ( main_widget_geometry.height() > main_widget_geometry.width() ) {
-        main_widget_geometry.setHeight(main_widget_geometry.width());
-    } else {
-        main_widget_geometry.setWidth(main_widget_geometry.height());
-    }
-
-//    main_widget->resize(main_widget_geometry);
-    this->resize(main_widget_geometry);
-//    update();
+    return w;
 }
+
+
+//void PF_table::resizeEvent(QResizeEvent *event)
+//{
+
+//    QSize main_widget_geometry = this->size();
+
+//    if ( main_widget_geometry.height() > main_widget_geometry.width() ) {
+//        main_widget_geometry.setHeight(main_widget_geometry.width());
+//    } else {
+//        main_widget_geometry.setWidth(main_widget_geometry.height());
+//    }
+
+////    main_widget->resize(main_widget_geometry);
+//    this->resize(main_widget_geometry);
+////    update();
+//}
 
 
 QSize PF_table::sizeHint() const
@@ -80,8 +80,8 @@ QSize PF_table::sizeHint() const
 
 QSizePolicy PF_table::sizePolicy() const
 {
-    return QSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
-//    return QSizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
+//    return QSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
+    return QSizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
 }
 
 

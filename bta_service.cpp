@@ -15,6 +15,7 @@
 #include <QStringList>
 
 static QStringList expTypeItems = QStringList({"obj","bias","dark","rotation"});
+
 static QStringList binValues = QStringList({"1","2","3","4","5"});
 
 
@@ -38,6 +39,40 @@ BTA_service::~BTA_service()
 
 void BTA_service::changeFrameType(QString type)
 {
+    if ( type == "bias" ) {
+        exp_time->setText("0");
+        exp_time->setEnabled(false);
+    } else {
+        exp_time->setEnabled(true);
+    }
+
+    if ( type == "rotation" ) { // activate PF table controls for sequence of positions
+        pf_table_stop_input_field->setEnabled(true);
+        pf_table_stop_label->setEnabled(true);
+        pf_table_start_input_field->setEnabled(true);
+        pf_table_start_label->setEnabled(true);
+        pf_table_step_input_field->setEnabled(true);
+        pf_table_step_label->setEnabled(true);
+
+        pf_table_new_label->setEnabled(false);
+        pf_table_new_input_field->setEnabled(false);
+    } else {
+        pf_table_stop_input_field->setEnabled(false);
+        pf_table_stop_label->setEnabled(false);
+        pf_table_start_input_field->setEnabled(false);
+        pf_table_start_label->setEnabled(false);
+        pf_table_step_input_field->setEnabled(false);
+        pf_table_step_label->setEnabled(false);
+
+        pf_table_new_label->setEnabled(true);
+        pf_table_new_input_field->setEnabled(true);
+    }
+}
+
+
+void BTA_service::newTablePos(const QString &pos)
+{
+    pf_table_widget->setNewPos(pos.toDouble());
 }
 
 
@@ -61,6 +96,8 @@ void BTA_service::setupUI()
     this->setCentralWidget(central_widget);
     central_widget->setFrameShape(QFrame::Box);
     central_widget->setFrameShadow(QFrame::Raised);
+
+
 
 
             /*  layouts definitions */
@@ -399,6 +436,8 @@ void BTA_service::setupUI()
 
     X_shift_input_field = new QLineEdit(tel_shift_root_widget);
     X_shift_input_field->setMaximumWidth(dw);
+    X_shift_input_field->setAlignment(Qt::AlignRight);
+    X_shift_input_field->setText("0");
 
 //    X_shift_slider = new QSlider(Qt::Horizontal,tel_shift_root_widget);
 //    X_shift_slider->setSingleStep(1);
@@ -411,6 +450,8 @@ void BTA_service::setupUI()
 
     Y_shift_input_field = new QLineEdit(tel_shift_root_widget);
     Y_shift_input_field->setMaximumWidth(dw);
+    Y_shift_input_field->setAlignment(Qt::AlignRight);
+    Y_shift_input_field->setText("0");
 
 //    Y_shift_slider = new QSlider(Qt::Horizontal,tel_shift_root_widget);
 //    Y_shift_slider->setSingleStep(1);
@@ -444,21 +485,29 @@ void BTA_service::setupUI()
     ff->setFrameShape(QFrame::Box);
     ff->setFrameShadow(QFrame::Plain);
     ff->setStyleSheet("background-color: white");
-    QSizePolicy pp(QSizePolicy::Preferred,QSizePolicy::Preferred);
-    pp.setHeightForWidth(true);
-    ff->setSizePolicy(pp);
+    QVBoxLayout *ffl = new QVBoxLayout(ff);
+    ffl->setAlignment(Qt::AlignCenter);
+    ffl->setMargin(0);
+    ffl->setSpacing(0);
+    ffl->setContentsMargins(0,0,0,0);
 
 //    pf_table_widget = new PF_table(220.0,pf_table_inner_widget);
     pf_table_widget = new PF_table(220.0,ff);
+    ffl->addWidget(pf_table_widget);
 
     pf_table_current_input_field = new QLineEdit(pf_table_controls_widget);
     pf_table_current_input_field->setAlignment(Qt::AlignRight);
     pf_table_current_input_field->setReadOnly(true);
+    pf_table_new_label = new QLabel("New",pf_table_controls_widget);
     pf_table_new_input_field = new QLineEdit(pf_table_controls_widget);
     pf_table_new_input_field->setAlignment(Qt::AlignRight);
     QDoubleValidator *table_val = new QDoubleValidator(__scale_start_angle__,__scale_stop_angle__,2,pf_table_new_input_field);
     pf_table_new_input_field->setValidator(table_val);
+    connect(pf_table_new_input_field,SIGNAL(textEdited(QString)),this,SLOT(newTablePos(QString)));
 
+    pf_table_start_label = new QLabel("Start",pf_table_controls_widget);
+    pf_table_stop_label = new QLabel("Stop",pf_table_controls_widget);
+    pf_table_step_label = new QLabel("Step",pf_table_controls_widget);
     pf_table_start_input_field = new QLineEdit(pf_table_controls_widget);
     pf_table_stop_input_field = new QLineEdit(pf_table_controls_widget);
     pf_table_step_input_field = new QLineEdit(pf_table_controls_widget);
@@ -470,7 +519,7 @@ void BTA_service::setupUI()
     pf_table_step_input_field->setValidator(table_val);
 
     pf_table_controls_layout->addRow("Current",pf_table_current_input_field);
-    pf_table_controls_layout->addRow("New",pf_table_new_input_field);
+    pf_table_controls_layout->addRow(pf_table_new_label,pf_table_new_input_field);
 
     pf_table_rotation_button = new QPushButton("Rotation",pf_table_controls_widget);
     pf_table_controls_layout->addRow("    ", pf_table_rotation_button);
@@ -480,20 +529,20 @@ void BTA_service::setupUI()
     empty_widget->setFixedHeight(30);
     pf_table_controls_layout->addRow("",empty_widget);
 
-    pf_table_controls_layout->addRow("Start",pf_table_start_input_field);
-    pf_table_controls_layout->addRow("Stop",pf_table_stop_input_field);
-    pf_table_controls_layout->addRow("Step",pf_table_step_input_field);
+    pf_table_controls_layout->addRow(pf_table_start_label,pf_table_start_input_field);
+    pf_table_controls_layout->addRow(pf_table_stop_label,pf_table_stop_input_field);
+    pf_table_controls_layout->addRow(pf_table_step_label,pf_table_step_input_field);
 
     pf_table_stop_input_field->setEnabled(false);
-    pf_table_controls_layout->labelForField(pf_table_stop_input_field)->setEnabled(false);
+    pf_table_stop_label->setEnabled(false);
     pf_table_start_input_field->setEnabled(false);
-    pf_table_controls_layout->labelForField(pf_table_start_input_field)->setEnabled(false);
+    pf_table_start_label->setEnabled(false);
     pf_table_step_input_field->setEnabled(false);
-    pf_table_controls_layout->labelForField(pf_table_step_input_field)->setEnabled(false);
+    pf_table_step_label->setEnabled(false);
 
 //    pf_table_inner_layout->addWidget(pf_table_widget,10);
     pf_table_inner_layout->addWidget(ff,10);
-    pf_table_inner_layout->addWidget(pf_table_controls_widget,7);
+    pf_table_inner_layout->addWidget(pf_table_controls_widget,6);
 
     pf_table_label = new QLabel("<b>PF table control</b>",pf_table_root_widget);
 
@@ -511,4 +560,10 @@ void BTA_service::setupUI()
 
                         /*      RIGHT PANEL      */
 
+}
+
+
+void BTA_service::resizeEvent(QResizeEvent *event)
+{
+    QMainWindow::resizeEvent(event);
 }

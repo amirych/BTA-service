@@ -26,11 +26,15 @@ public:
     BTA_service(QWidget *parent = 0);
     ~BTA_service();
 
+protected slots:
+    void resizeEvent(QResizeEvent *event);
+
 private slots:
     void changeFrameType(QString type);
     void changeBinX(int index);
     void changeBinY(int index);
 
+    void newTablePos(const QString &pos);
 private:
     /*     Functions       */
 
@@ -109,10 +113,12 @@ private:
     PF_table *pf_table_widget;
 //    QLabel *pf_table_current_label;
     QLineEdit *pf_table_current_input_field;
-//    QLabel *pf_table_new_label;
+    QLabel *pf_table_new_label;
     QLineEdit *pf_table_new_input_field;
 //    QCheckBox *pf_table_step_check;
-//    QLabel *pf_table_step_label;
+    QLabel *pf_table_step_label;
+    QLabel *pf_table_stop_label;
+    QLabel *pf_table_start_label;
     QLineEdit *pf_table_step_input_field;
     QLineEdit *pf_table_start_input_field;
     QLineEdit *pf_table_stop_input_field;

@@ -26,7 +26,7 @@ public:
     QSize sizeHint() const;
     QSizePolicy sizePolicy() const;
 
-//    int heightForWidth(int w) const;
+    int heightForWidth(int w) const;
 //    bool hasHeightForWidth() const;
 
 signals:
@@ -40,7 +40,7 @@ public slots:
     void paintEvent(QPaintEvent *event);
 
 protected:
-    void resizeEvent(QResizeEvent *event);
+//    void resizeEvent(QResizeEvent *event);
 
 private:
     void drawTable();
