@@ -173,14 +173,20 @@ private:
     QGroupBox *pointing_residual_root_widget;
     QLabel *pointing_file_label;
     QLineEdit *pointing_file_input_field;
-    QLabel *pointing_file_alpha_label;
-    QLineEdit *pointing_file_alpha_input_field;
-    QLabel *pointing_file_alpha_result_label;
-    QLabel *pointing_file_delta_label;
-    QLineEdit *pointing_file_delta_input_field;
-    QLabel *pointing_file_delta_result_label;
-
-
+    QLabel *acs_coords_label;
+    QLineEdit *acs_alpha_input_field;
+    QLineEdit *acs_delta_input_field;
+    QLabel *real_alpha_label;
+    QLineEdit *real_alpha_input_field;
+    QLabel *real_coords_label;
+    QLineEdit *real_delta_input_field;
+    QPushButton *pointing_residual_calc_button;
+    QPushButton *pointing_residual_load_button;
+    QLabel *alpha_coord_label;
+    QLabel *delta_coord_label;
+    QLabel *residual_label;
+    QLineEdit *alpha_residual;
+    QLineEdit *delta_residual;
 
 };
 

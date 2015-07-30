@@ -496,6 +496,7 @@ void BTA_service::setupUI()
     ff->setFrameShape(QFrame::Box);
     ff->setFrameShadow(QFrame::Plain);
     ff->setStyleSheet("background-color: white");
+    ff->setMinimumSize(150,150);
     QVBoxLayout *ffl = new QVBoxLayout(ff);
     ffl->setAlignment(Qt::AlignCenter);
     ffl->setMargin(0);
@@ -576,6 +577,7 @@ void BTA_service::setupUI()
 
     FITS_filename_label = new QLabel("No image",right_panel);
     fits_viewer_widget = new Fits_viewer(right_panel);
+//    fits_viewer_widget->setFixedSize(400,400);
 
     QWidget *image_controls_widget = new QWidget(right_panel);
     QVBoxLayout *image_controls_layout = new QVBoxLayout(image_controls_widget);
@@ -621,7 +623,8 @@ void BTA_service::setupUI()
     zoom_coords_layout->setMargin(0);
 
     zoom_widget = new Fits_viewer(zoom_coords);
-    zoom_widget->setMinimumSize(200,200);
+    zoom_widget->setFixedSize(150,150);
+//    zoom_widget->setMinimumSize(150,150);
 
     QWidget *axes_widget = new QWidget(zoom_coords);
     QFormLayout *axes_layout = new QFormLayout(axes_widget);
@@ -630,7 +633,7 @@ void BTA_service::setupUI()
 
     QWidget *mirror_axis_widget = new QWidget(axes_widget);
     QHBoxLayout *mirror_axis_layout = new QHBoxLayout(mirror_axis_widget);
-    mirror_axis_layout->setMargin(0);
+//    mirror_axis_layout->setMargin(0);
 
     mirror_axis_label = new QLabel("mirror axis",axes_widget);
 
@@ -647,7 +650,7 @@ void BTA_service::setupUI()
 
     QWidget *table_axis_widget = new QWidget(axes_widget);
     QHBoxLayout *table_axis_layout = new QHBoxLayout(table_axis_widget);
-    table_axis_layout->setMargin(0);
+//    table_axis_layout->setMargin(0);
 
     table_axis_label = new QLabel("PF-table axis",axes_widget);
 
@@ -681,19 +684,24 @@ void BTA_service::setupUI()
 
     axes_calc_root_widget = new QGroupBox("Mirror and PF-table axes calculation",data_reduc_pointing_widget);
     QVBoxLayout *axes_calc_layout = new QVBoxLayout(axes_calc_root_widget);
-    axes_calc_layout->setMargin(0);
+//    axes_calc_layout->setMargin(0);
 
     QWidget *mirror_file_widget = new QWidget(axes_calc_root_widget);
     QHBoxLayout *mirror_file_layout = new QHBoxLayout(mirror_file_widget);
 //    mirror_file_layout->setMargin(0);
     QMargins marg = mirror_file_layout->contentsMargins();
     marg.setBottom(0);
-    marg.setTop(0);
+//    marg.setTop(0);
     mirror_file_layout->setContentsMargins(marg);
 
     str = QString(BTA_SERVICE_FILE_MAX_CHARS,'0');
 
-    mirror_file_label = new QLabel("    mirror file",mirror_file_widget);
+    mirror_file_label = new QLabel("mirror file",mirror_file_widget);
+    fn = mirror_file_label->font();
+    fnm = QFontMetrics(fn);
+    dw = fnm.width("PF-table file");
+    mirror_file_label->setMinimumWidth(dw);
+
     mirror_file_input_field = new QLineEdit(mirror_file_widget);
     fn = mirror_file_input_field->font();
     fnm = QFontMetrics(fn);
@@ -719,7 +727,7 @@ void BTA_service::setupUI()
     QWidget *table_file_widget = new QWidget(axes_calc_root_widget);
     QHBoxLayout *table_file_layout = new QHBoxLayout(table_file_widget);
     marg = table_file_layout->contentsMargins();
-    marg.setBottom(0);
+//    marg.setBottom(0);
     marg.setTop(0);
     table_file_layout->setContentsMargins(marg);
 
@@ -758,9 +766,86 @@ void BTA_service::setupUI()
     QVBoxLayout *pointing_residual_layout = new QVBoxLayout(pointing_residual_root_widget);
     pointing_residual_layout->setMargin(0);
 
+    QWidget *pointing_residual_file_widget = new QWidget(pointing_residual_root_widget);
+    QHBoxLayout *pointing_residual_file_layout = new QHBoxLayout(pointing_residual_file_widget);
+    marg = pointing_residual_file_layout->contentsMargins();
+    marg.setBottom(0);
+//    marg.setTop(0);
+    pointing_residual_file_layout->setContentsMargins(marg);
+
+    pointing_file_label = new QLabel("file",pointing_residual_file_widget);
+    pointing_file_input_field = new QLineEdit(pointing_residual_file_widget);
+    fn = pointing_file_input_field->font();
+    fnm = QFontMetrics(fn);
+    dw = fnm.width(str);
+//    pointing_file_input_field->setFixedWidth(dw);
+    pointing_file_input_field->setMinimumWidth(dw);
+    pointing_residual_load_button = new QPushButton("Load",pointing_residual_file_widget);
+    pointing_residual_calc_button = new QPushButton("Calc",pointing_residual_file_widget);
+
+    pointing_residual_file_layout->addWidget(pointing_file_label);
+    pointing_residual_file_layout->addWidget(pointing_file_input_field);
+    pointing_residual_file_layout->addWidget(pointing_residual_load_button);
+    pointing_residual_file_layout->addWidget(pointing_residual_calc_button);
+    pointing_residual_file_layout->addStretch(10);
 
 
-    data_reduc_pointing_layout->addWidget(data_reduc_label);
+    QWidget *pointing_coords = new QWidget(pointing_residual_root_widget);
+    QGridLayout *pointing_coords_layout = new QGridLayout(pointing_coords);
+
+    acs_coords_label = new QLabel("ACS",pointing_coords);
+    real_coords_label = new QLabel("Real",pointing_coords);
+    residual_label = new QLabel("ACS-Real",pointing_coords);
+    alpha_coord_label = new QLabel("<font size=""+1"">"+QString(QChar(0xb1, 0x03))+"<sub>2000.0</sub></font>",pointing_coords);
+    delta_coord_label = new QLabel("<font size=""+1"">"+QString(QChar(0xb4, 0x03))+"<sub>2000.0</sub></font>",pointing_coords);
+
+    acs_alpha_input_field = new QLineEdit(pointing_coords);
+    acs_alpha_input_field->setReadOnly(true);
+    acs_alpha_input_field->setAlignment(Qt::AlignRight);
+    acs_delta_input_field = new QLineEdit(pointing_coords);
+    acs_delta_input_field->setReadOnly(true);
+    acs_delta_input_field->setAlignment(Qt::AlignRight);
+    real_alpha_input_field = new QLineEdit(pointing_coords);
+    real_alpha_input_field->setReadOnly(true);
+    real_alpha_input_field->setAlignment(Qt::AlignRight);
+    real_delta_input_field = new QLineEdit(pointing_coords);
+    real_delta_input_field->setReadOnly(true);
+    real_delta_input_field->setAlignment(Qt::AlignRight);
+    alpha_residual = new QLineEdit(pointing_coords);
+    alpha_residual->setReadOnly(true);
+    alpha_residual->setAlignment(Qt::AlignRight);
+    delta_residual = new QLineEdit(pointing_coords);
+    delta_residual->setReadOnly(true);
+    delta_residual->setAlignment(Qt::AlignRight);
+
+    acs_alpha_input_field->setText("12:32:56.0");
+    acs_delta_input_field->setText("+32:19:45.32");
+    real_alpha_input_field->setText("12:32:55.5");
+    real_delta_input_field->setText("+32:19:50.43");
+    alpha_residual->setText("7.5\"");
+    delta_residual->setText("-5.11\"");
+
+
+
+    pointing_coords_layout->addWidget(acs_coords_label,0,1,Qt::AlignCenter);
+    pointing_coords_layout->addWidget(real_coords_label,0,2,Qt::AlignCenter);
+    pointing_coords_layout->addWidget(residual_label,0,3,Qt::AlignCenter);
+    pointing_coords_layout->addWidget(alpha_coord_label,1,0);
+    pointing_coords_layout->addWidget(delta_coord_label,2,0);
+    pointing_coords_layout->addWidget(acs_alpha_input_field,1,1);
+    pointing_coords_layout->addWidget(acs_delta_input_field,2,1);
+    pointing_coords_layout->addWidget(real_alpha_input_field,1,2);
+    pointing_coords_layout->addWidget(real_delta_input_field,2,2);
+    pointing_coords_layout->addWidget(alpha_residual,1,3);
+    pointing_coords_layout->addWidget(delta_residual,2,3);
+
+
+
+    pointing_residual_layout->addWidget(pointing_residual_file_widget);
+    pointing_residual_layout->addWidget(pointing_coords);
+//    pointing_residual_layout->addWidget(pointing_residual_calc_button,Qt::AlignRight);
+
+    data_reduc_pointing_layout->addWidget(data_reduc_label,0,Qt::AlignHCenter);
     data_reduc_pointing_layout->addWidget(axes_calc_root_widget);
     data_reduc_pointing_layout->addWidget(pointing_residual_root_widget);
 
@@ -769,7 +854,7 @@ void BTA_service::setupUI()
     zoom_data_reduc_layout->addWidget(data_reduc_pointing_widget,3);
 
 
-    right_panel_layout->addWidget(FITS_filename_label);
+    right_panel_layout->addWidget(FITS_filename_label,0,Qt::AlignHCenter);
     right_panel_layout->addWidget(fits_image_widget,2);
     right_panel_layout->addWidget(zoom_data_reduc,1);
 
@@ -777,7 +862,7 @@ void BTA_service::setupUI()
     QFrame *separator_line = new QFrame(central_widget);
     separator_line->setFrameStyle(QFrame::VLine);
     separator_line->setFrameShadow(QFrame::Sunken);
-    separator_line->setLineWidth(3);
+    separator_line->setLineWidth(4);
 
     main_layout->addWidget(left_panel,1);
     main_layout->addWidget(separator_line);
