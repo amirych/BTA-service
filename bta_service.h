@@ -6,16 +6,19 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QFrame>
+#include <QGroupBox>
 #include <QComboBox>
 #include <QTextEdit>
 #include <QSlider>
 #include <QCheckBox>
+#include <QDoubleSpinBox>
 
 #include "../fits_viewer/fits_viewer.h"
 #include "pf_table.h"
 
 
 #define BTA_SERVICE_NEXP_MAX_DIGITS 3
+#define BTA_SERVICE_FILE_MAX_CHARS 20
 
 
 class BTA_service : public QMainWindow
@@ -132,18 +135,52 @@ private:
     QLabel *FITS_filename_label;
     Fits_viewer *fits_viewer_widget;
     QPushButton *load_file_button;
+    QDoubleSpinBox *image_cuts_low;
+    QDoubleSpinBox *image_cuts_high;
     QLabel *current_pixel_coords_label;
     QLabel *current_pixel_value_label;
     QPushButton *plot_region_button;
     QPushButton *region_stat_button;
+    QPushButton *region_centroid_button;
     QPushButton *seeing_button;
     QLabel *psf_coords_label;
     QLabel *psf_fwhm_label;
 
     // image zoom and data reduction controls
     Fits_viewer *zoom_widget;
+    QLabel *mirror_axis_label;
+    QLabel *table_axis_label;
+    QLineEdit *mirror_axis_X_input_field;
+    QLineEdit *mirror_axis_Y_input_field;
+    QLineEdit *table_axis_X_input_field;
+    QLineEdit *table_axis_Y_input_field;
+
     QLabel *data_reduc_label;
-    QFrame *axis_calc_root_widget;
+
+    QGroupBox *axes_calc_root_widget;
+    QLabel *mirror_file_label;
+    QLineEdit *mirror_file_input_field;
+    QLabel *mirror_file_Nexp_label;
+    QLineEdit *mirror_file_Nexp_input_field;
+    QLabel *mirror_reduc_result_label;
+    QLabel *table_file_label;
+    QLineEdit *table_file_input_field;
+    QLabel *table_file_Nexp_label;
+    QLineEdit *table_file_Nexp_input_field;
+    QLabel *table_reduc_result_label;
+    QPushButton *run_reduc_button;
+
+    QGroupBox *pointing_residual_root_widget;
+    QLabel *pointing_file_label;
+    QLineEdit *pointing_file_input_field;
+    QLabel *pointing_file_alpha_label;
+    QLineEdit *pointing_file_alpha_input_field;
+    QLabel *pointing_file_alpha_result_label;
+    QLabel *pointing_file_delta_label;
+    QLineEdit *pointing_file_delta_input_field;
+    QLabel *pointing_file_delta_result_label;
+
+
 
 };
 

@@ -5,12 +5,14 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QFormLayout>
+#include <QGridLayout>
 #include <QSpacerItem>
 #include <QFont>
 #include <QFontMetrics>
 #include <QIntValidator>
 #include <QDoubleValidator>
 #include <QMargins>
+
 
 #include <QStringList>
 
@@ -101,12 +103,11 @@ void BTA_service::setupUI()
 
 
             /*  layouts definitions */
+    QHBoxLayout *main_layout = new QHBoxLayout(central_widget);
+    main_layout->setMargin(0);
 
     QWidget *left_panel = new QWidget(central_widget);
     QVBoxLayout *left_panel_layout = new QVBoxLayout(left_panel);
-
-    QWidget *right_panel = new QWidget(central_widget);
-    QVBoxLayout *right_panel_layout = new QVBoxLayout(right_panel);
 
     QWidget *file_exp_widget = new QWidget(left_panel);
     QHBoxLayout *file_exp_layout = new QHBoxLayout(file_exp_widget);
@@ -114,6 +115,16 @@ void BTA_service::setupUI()
     QWidget *shift_table_widget = new QWidget(left_panel);
     QHBoxLayout *shift_table_layout = new QHBoxLayout(shift_table_widget);
     shift_table_layout->setMargin(0);
+
+
+    QWidget *right_panel = new QWidget(central_widget);
+    QVBoxLayout *right_panel_layout = new QVBoxLayout(right_panel);
+
+    QWidget *fits_image_widget = new QWidget(right_panel);
+    QHBoxLayout *fits_image_layout = new QHBoxLayout(fits_image_widget);
+
+    QWidget *zoom_data_reduc = new QWidget(right_panel);
+    QHBoxLayout *zoom_data_reduc_layout = new QHBoxLayout(zoom_data_reduc);
 
 
                                     /*      LEFT PANEL      */
@@ -558,8 +569,219 @@ void BTA_service::setupUI()
     left_panel_layout->addWidget(shift_table_widget);
 
 
+
                         /*      RIGHT PANEL      */
 
+    // FITS image viewer and controls
+
+    FITS_filename_label = new QLabel("No image",right_panel);
+    fits_viewer_widget = new Fits_viewer(right_panel);
+
+    QWidget *image_controls_widget = new QWidget(right_panel);
+    QVBoxLayout *image_controls_layout = new QVBoxLayout(image_controls_widget);
+    image_controls_layout->setAlignment(Qt::AlignHCenter);
+    image_controls_layout->setMargin(0);
+
+    load_file_button = new QPushButton("LOAD FILE",image_controls_widget);
+    image_cuts_low = new QDoubleSpinBox(image_controls_widget);
+    image_cuts_high = new QDoubleSpinBox(image_controls_widget);
+    current_pixel_coords_label = new QLabel("Pixel: [0,0]",image_controls_widget);
+    current_pixel_value_label = new QLabel("Value: 0.0",image_controls_widget);
+    plot_region_button = new QPushButton("plot region",image_controls_widget);
+    region_stat_button = new QPushButton("region statistics",image_controls_widget);
+    region_centroid_button = new QPushButton("region centroid",image_controls_widget);
+    seeing_button = new QPushButton("seeing",image_controls_widget);
+    psf_coords_label = new QLabel("X: 0.0, Y: 0.0",image_controls_widget);
+    psf_fwhm_label = new QLabel("FWHM: 0.0",image_controls_widget);
+
+    image_controls_layout->addWidget(load_file_button);
+    image_controls_layout->addWidget(image_cuts_low);
+    image_controls_layout->addWidget(image_cuts_high);
+    image_controls_layout->addWidget(current_pixel_coords_label);
+    image_controls_layout->addWidget(current_pixel_value_label);
+    image_controls_layout->addStretch(1);
+    image_controls_layout->addWidget(plot_region_button);
+    image_controls_layout->addWidget(region_stat_button);
+    image_controls_layout->addWidget(region_centroid_button);
+    image_controls_layout->addWidget(seeing_button);
+    image_controls_layout->addWidget(psf_coords_label);
+    image_controls_layout->addWidget(psf_fwhm_label);
+    image_controls_layout->addStretch(3);
+
+    fits_image_layout->addWidget(fits_viewer_widget,5);
+    fits_image_layout->addWidget(image_controls_widget,1);
+
+
+        /* zoom and data reduction  */
+
+    // zoom and axes coordinate
+
+    QWidget *zoom_coords = new QWidget(zoom_data_reduc);
+    QVBoxLayout *zoom_coords_layout = new QVBoxLayout(zoom_coords);
+    zoom_coords_layout->setMargin(0);
+
+    zoom_widget = new Fits_viewer(zoom_coords);
+    zoom_widget->setMinimumSize(200,200);
+
+    QWidget *axes_widget = new QWidget(zoom_coords);
+    QFormLayout *axes_layout = new QFormLayout(axes_widget);
+    axes_layout->setMargin(0);
+    axes_layout->setAlignment(Qt::AlignHCenter|Qt::AlignTop);
+
+    QWidget *mirror_axis_widget = new QWidget(axes_widget);
+    QHBoxLayout *mirror_axis_layout = new QHBoxLayout(mirror_axis_widget);
+    mirror_axis_layout->setMargin(0);
+
+    mirror_axis_label = new QLabel("mirror axis",axes_widget);
+
+    mirror_axis_X_input_field = new QLineEdit(mirror_axis_widget);
+    mirror_axis_Y_input_field = new QLineEdit(mirror_axis_widget);
+
+    QLabel *tmp_label = new QLabel("X:",mirror_axis_widget);
+
+    mirror_axis_layout->addWidget(tmp_label);
+    mirror_axis_layout->addWidget(mirror_axis_X_input_field);
+    tmp_label = new QLabel("Y:",mirror_axis_widget);
+    mirror_axis_layout->addWidget(tmp_label);
+    mirror_axis_layout->addWidget(mirror_axis_Y_input_field);
+
+    QWidget *table_axis_widget = new QWidget(axes_widget);
+    QHBoxLayout *table_axis_layout = new QHBoxLayout(table_axis_widget);
+    table_axis_layout->setMargin(0);
+
+    table_axis_label = new QLabel("PF-table axis",axes_widget);
+
+    table_axis_X_input_field = new QLineEdit(table_axis_widget);
+    table_axis_Y_input_field = new QLineEdit(table_axis_widget);
+
+    tmp_label = new QLabel("X:",table_axis_widget);
+    table_axis_layout->addWidget(tmp_label);
+    table_axis_layout->addWidget(table_axis_X_input_field);
+    tmp_label = new QLabel("Y:",table_axis_widget);
+    table_axis_layout->addWidget(tmp_label);
+    table_axis_layout->addWidget(table_axis_Y_input_field);
+
+    axes_layout->addRow("",mirror_axis_label);
+    axes_layout->addRow("",mirror_axis_widget);
+    axes_layout->addRow("",table_axis_label);
+    axes_layout->addRow("",table_axis_widget);
+
+
+    zoom_coords_layout->addWidget(zoom_widget);
+    zoom_coords_layout->addWidget(axes_widget);
+
+
+    // data reduction
+    QFrame *data_reduc_pointing_widget = new QFrame(zoom_data_reduc);
+    data_reduc_pointing_widget->setFrameStyle(QFrame::Box | QFrame::Plain);
+    QVBoxLayout *data_reduc_pointing_layout = new QVBoxLayout(data_reduc_pointing_widget);
+//    data_reduc_pointing_layout->setMargin(0);
+
+    data_reduc_label = new QLabel("<b>Data reduction</b>",data_reduc_pointing_widget);
+
+    axes_calc_root_widget = new QGroupBox("Mirror and PF-table axes calculation",data_reduc_pointing_widget);
+    QVBoxLayout *axes_calc_layout = new QVBoxLayout(axes_calc_root_widget);
+    axes_calc_layout->setMargin(0);
+
+    QWidget *mirror_file_widget = new QWidget(axes_calc_root_widget);
+    QHBoxLayout *mirror_file_layout = new QHBoxLayout(mirror_file_widget);
+//    mirror_file_layout->setMargin(0);
+    QMargins marg = mirror_file_layout->contentsMargins();
+    marg.setBottom(0);
+    marg.setTop(0);
+    mirror_file_layout->setContentsMargins(marg);
+
+    str = QString(BTA_SERVICE_FILE_MAX_CHARS,'0');
+
+    mirror_file_label = new QLabel("    mirror file",mirror_file_widget);
+    mirror_file_input_field = new QLineEdit(mirror_file_widget);
+    fn = mirror_file_input_field->font();
+    fnm = QFontMetrics(fn);
+    dw = fnm.width(str);
+    mirror_file_input_field->setMinimumWidth(dw);
+    mirror_file_Nexp_label = new QLabel("Nexp",mirror_file_widget);
+    mirror_file_Nexp_input_field = new QLineEdit(mirror_file_widget);
+    fn = mirror_file_Nexp_input_field->font();
+    fnm = QFontMetrics(fn);
+    dw = fnm.width("0000");
+    mirror_file_Nexp_input_field->setMaximumWidth(dw);
+    mirror_file_Nexp_input_field->setMinimumWidth(dw);
+    mirror_reduc_result_label = new QLabel("x = 0.0  y = 0.0",mirror_file_widget);
+
+    mirror_file_layout->addWidget(mirror_file_label);
+    mirror_file_layout->addWidget(mirror_file_input_field);
+    mirror_file_layout->addWidget(mirror_file_Nexp_label);
+    mirror_file_layout->addWidget(mirror_file_Nexp_input_field);
+    mirror_file_layout->addStretch(3);
+    mirror_file_layout->addWidget(mirror_reduc_result_label);
+    mirror_file_layout->addStretch(1);
+
+    QWidget *table_file_widget = new QWidget(axes_calc_root_widget);
+    QHBoxLayout *table_file_layout = new QHBoxLayout(table_file_widget);
+    marg = table_file_layout->contentsMargins();
+    marg.setBottom(0);
+    marg.setTop(0);
+    table_file_layout->setContentsMargins(marg);
+
+    table_file_label = new QLabel("PF-table file",table_file_widget);
+    table_file_input_field = new QLineEdit(table_file_widget);
+    fn = table_file_input_field->font();
+    fnm = QFontMetrics(fn);
+    dw = fnm.width(str);
+    table_file_input_field->setMinimumWidth(dw);
+    table_file_Nexp_label = new QLabel("Nexp",table_file_widget);
+    table_file_Nexp_input_field = new QLineEdit(table_file_widget);
+    fn = table_file_Nexp_input_field->font();
+    fnm = QFontMetrics(fn);
+    dw = fnm.width("0000");
+    table_file_Nexp_input_field->setMaximumWidth(dw);
+    table_file_Nexp_input_field->setMinimumWidth(dw);
+    table_reduc_result_label = new QLabel("x = 0.0  y = 0.0",table_file_widget);
+
+    table_file_layout->addWidget(table_file_label);
+    table_file_layout->addWidget(table_file_input_field);
+    table_file_layout->addWidget(table_file_Nexp_label);
+    table_file_layout->addWidget(table_file_Nexp_input_field);
+    table_file_layout->addStretch(3);
+    table_file_layout->addWidget(table_reduc_result_label);
+    table_file_layout->addStretch(1);
+
+    run_reduc_button = new QPushButton("Run",axes_calc_root_widget);
+
+    axes_calc_layout->addWidget(data_reduc_label,0,Qt::AlignCenter);
+    axes_calc_layout->addWidget(mirror_file_widget);
+    axes_calc_layout->addWidget(table_file_widget);
+    axes_calc_layout->addWidget(run_reduc_button,0,Qt::AlignRight);
+
+
+    pointing_residual_root_widget = new QGroupBox("Telescope pointing mismatch");
+    QVBoxLayout *pointing_residual_layout = new QVBoxLayout(pointing_residual_root_widget);
+    pointing_residual_layout->setMargin(0);
+
+
+
+    data_reduc_pointing_layout->addWidget(data_reduc_label);
+    data_reduc_pointing_layout->addWidget(axes_calc_root_widget);
+    data_reduc_pointing_layout->addWidget(pointing_residual_root_widget);
+
+
+    zoom_data_reduc_layout->addWidget(zoom_coords,1);
+    zoom_data_reduc_layout->addWidget(data_reduc_pointing_widget,3);
+
+
+    right_panel_layout->addWidget(FITS_filename_label);
+    right_panel_layout->addWidget(fits_image_widget,2);
+    right_panel_layout->addWidget(zoom_data_reduc,1);
+
+
+    QFrame *separator_line = new QFrame(central_widget);
+    separator_line->setFrameStyle(QFrame::VLine);
+    separator_line->setFrameShadow(QFrame::Sunken);
+    separator_line->setLineWidth(3);
+
+    main_layout->addWidget(left_panel,1);
+    main_layout->addWidget(separator_line);
+    main_layout->addWidget(right_panel,1);
 }
 
 
