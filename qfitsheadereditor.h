@@ -10,6 +10,7 @@
 
 #include <fitsio.h>
 
+#define QFITSHEADEREDITOR_ERROR_OK 0
 
 class QFitsHeaderEditor : public QWidget
 {
@@ -20,6 +21,7 @@ public:
     QFitsHeaderEditor(QString fits_filename, QWidget *parent);
     QFitsHeaderEditor(QString fits_filename, QStringList keynames, QWidget *parent);
 
+    int getCurrentError() const;
 
 signals:
     void error(int err);
@@ -32,6 +34,8 @@ private:
 
     QString Fits_filename;
     fitsfile *Fits_file;
+
+    int currentError;
 
     QPushButton *load_file;
     QPushButton *cancel;
