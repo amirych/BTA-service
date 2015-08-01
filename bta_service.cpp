@@ -12,7 +12,7 @@
 #include <QIntValidator>
 #include <QDoubleValidator>
 #include <QMargins>
-
+#include <QFileDialog>
 
 #include <QStringList>
 
@@ -84,6 +84,57 @@ void BTA_service::changeBinX(int index)
 
 void BTA_service::changeBinY(int index)
 {
+}
+
+
+
+void BTA_service::openFileInViewer()
+{
+    QString working_path = current_path_input_field->text();
+    working_path = working_path.trimmed();
+
+    if ( working_path.isEmpty() ) working_path = ".";
+
+    QString filename = QFileDialog::getOpenFileName(this,"Open FITS file ...",working_path,BTA_SERVICE_FITS_FILE_FILTER);
+
+    fits_viewer_widget->LoadFile(filename);
+    if ( fits_viewer_widget->getCurrentError() != FITS_VIEWER_ERROR_OK) {
+        // TODO ...
+        return;
+    }
+
+    FITS_filename_label->setText(filename);
+}
+
+
+void BTA_service::showImagePoint(double xpos, double ypos, double val)
+{
+    current_pixel_coords_label->setText("Pixel: [" + QString::number(xpos,'f',1) + ", " + QString::number(ypos,'f',1) + "]");
+    current_pixel_value_label->setText("Value: " + QString::number(val,'g'));
+}
+
+
+void BTA_service::showImageScaling(double low_cut, double high_cut)
+{
+    double lc,hc;
+
+    fits_viewer_widget->GetImageMinMax(&lc,&hc);
+    image_cuts_low->setRange(lc,hc);
+    image_cuts_high->setRange(lc,hc);
+
+    image_cuts_low->setValue(low_cut);
+    image_cuts_high->setValue(high_cut);
+}
+
+
+void BTA_service::changeImageScaling(double val)
+{
+    double low_cut = val, hight_cut;
+
+    low_cut = image_cuts_low->value();
+    hight_cut = image_cuts_high->value();
+
+    fits_viewer_widget->ScaleImage(low_cut,hight_cut);
 }
 
 
@@ -577,6 +628,8 @@ void BTA_service::setupUI()
 
     FITS_filename_label = new QLabel("No image",right_panel);
     fits_viewer_widget = new Fits_viewer(right_panel);
+    connect(fits_viewer_widget,SIGNAL(ImagePoint(double,double,double)),this,SLOT(showImagePoint(double,double,double)));
+    connect(fits_viewer_widget,SIGNAL(ScalingIsChanged(double,double)),this,SLOT(showImageScaling(double,double)));
 //    fits_viewer_widget->setFixedSize(400,400);
 
     QWidget *image_controls_widget = new QWidget(right_panel);
@@ -584,14 +637,24 @@ void BTA_service::setupUI()
     image_controls_layout->setAlignment(Qt::AlignHCenter);
     image_controls_layout->setMargin(0);
 
-    load_file_button = new QPushButton("LOAD FILE",image_controls_widget);
+    load_file_button = new QPushButton("Load file",image_controls_widget);
+    connect(load_file_button,SIGNAL(clicked()),this,SLOT(openFileInViewer()));
+
     image_cuts_low = new QDoubleSpinBox(image_controls_widget);
     image_cuts_high = new QDoubleSpinBox(image_controls_widget);
+    connect(image_cuts_low,SIGNAL(valueChanged(double)),this,SLOT(changeImageScaling(double)));
+    connect(image_cuts_high,SIGNAL(valueChanged(double)),this,SLOT(changeImageScaling(double)));
+
     current_pixel_coords_label = new QLabel("Pixel: [0,0]",image_controls_widget);
+    fn = current_pixel_coords_label->font();
+    fnm = QFontMetrics(fn);
+    dw = fnm.width("Pixel: [0000.0, 0000.0]");
+    current_pixel_coords_label->setFixedWidth(dw);
+
     current_pixel_value_label = new QLabel("Value: 0.0",image_controls_widget);
     plot_region_button = new QPushButton("plot region",image_controls_widget);
-    region_stat_button = new QPushButton("region statistics",image_controls_widget);
-    region_centroid_button = new QPushButton("region centroid",image_controls_widget);
+    region_stat_button = new QPushButton(" region statistics ",image_controls_widget);
+    region_centroid_button = new QPushButton(" region centroid ",image_controls_widget);
     seeing_button = new QPushButton("seeing",image_controls_widget);
     psf_coords_label = new QLabel("X: 0.0, Y: 0.0",image_controls_widget);
     psf_fwhm_label = new QLabel("FWHM: 0.0",image_controls_widget);

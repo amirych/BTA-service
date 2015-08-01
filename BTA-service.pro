@@ -15,10 +15,12 @@ QMAKE_CXXFLAGS += -std=c++11
 
 SOURCES += main.cpp\
         bta_service.cpp \
-    pf_table.cpp
+    pf_table.cpp \
+    qfitsheadereditor.cpp
 
 HEADERS  += bta_service.h \
-    pf_table.h
+    pf_table.h \
+    qfitsheadereditor.h
 
 unix:CONFIG(release,release|debug) LIBS += -L$$PWD/../build-fits_viewer-QT5-Release/ -lfits_viewer
 unix:CONFIG(debug,release|debug) LIBS += -L$$PWD/../build-fits_viewer-QT5-Debug/ -lfits_viewer

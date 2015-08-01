@@ -14,5 +14,8 @@ int main(int argc, char *argv[])
 
 //    pp.setNewPos(310);
 
+//    Fits_viewer ff("/home/timur/zz10.fts");
+//    ff.show();
+
     return a.exec();
 }

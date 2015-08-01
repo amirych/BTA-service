@@ -19,6 +19,7 @@
 
 #define BTA_SERVICE_NEXP_MAX_DIGITS 3
 #define BTA_SERVICE_FILE_MAX_CHARS 20
+#define BTA_SERVICE_FITS_FILE_FILTER "FITS (*.fits *.fts *.mt *.FITS *.FTS *.MT);;All (* *.*)"
 
 
 class BTA_service : public QMainWindow
@@ -38,6 +39,12 @@ private slots:
     void changeBinY(int index);
 
     void newTablePos(const QString &pos);
+
+    void openFileInViewer();
+    void showImagePoint(double xpos, double ypos, double val);
+    void showImageScaling(double low_cut, double high_cut);
+    void changeImageScaling(double val);
+
 private:
     /*     Functions       */
 
