@@ -547,7 +547,7 @@ void BTA_service::setupUI()
     ff->setFrameShape(QFrame::Box);
     ff->setFrameShadow(QFrame::Plain);
     ff->setStyleSheet("background-color: white");
-    ff->setMinimumSize(150,150);
+    ff->setMinimumSize(120,120);
     QVBoxLayout *ffl = new QVBoxLayout(ff);
     ffl->setAlignment(Qt::AlignCenter);
     ffl->setMargin(0);
@@ -630,7 +630,7 @@ void BTA_service::setupUI()
     fits_viewer_widget = new Fits_viewer(right_panel);
     connect(fits_viewer_widget,SIGNAL(ImagePoint(double,double,double)),this,SLOT(showImagePoint(double,double,double)));
     connect(fits_viewer_widget,SIGNAL(ScalingIsChanged(double,double)),this,SLOT(showImageScaling(double,double)));
-//    fits_viewer_widget->setFixedSize(400,400);
+    fits_viewer_widget->setFixedSize(520,520);
 
     QWidget *image_controls_widget = new QWidget(right_panel);
     QVBoxLayout *image_controls_layout = new QVBoxLayout(image_controls_widget);
@@ -927,9 +927,9 @@ void BTA_service::setupUI()
     separator_line->setFrameShadow(QFrame::Sunken);
     separator_line->setLineWidth(4);
 
-    main_layout->addWidget(left_panel,1);
+    main_layout->addWidget(left_panel,2);
     main_layout->addWidget(separator_line);
-    main_layout->addWidget(right_panel,1);
+    main_layout->addWidget(right_panel,2);
 }
 
 

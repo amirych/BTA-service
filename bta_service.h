@@ -19,7 +19,7 @@
 
 #define BTA_SERVICE_NEXP_MAX_DIGITS 3
 #define BTA_SERVICE_FILE_MAX_CHARS 20
-#define BTA_SERVICE_FITS_FILE_FILTER "FITS (*.fits *.fts *.mt *.FITS *.FTS *.MT);;All (* *.*)"
+#define BTA_SERVICE_FITS_FILE_FILTER "FITS (*.fits *.fts *.fit *.mt *.FITS *.FTS *.FIT *.MT);;All (* *.*)"
 
 
 class BTA_service : public QMainWindow

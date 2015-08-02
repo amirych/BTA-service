@@ -11,6 +11,7 @@
 
 #include<cmath>
 
+#include <QDebug>
 
             /*    Constructors    */
 
@@ -25,7 +26,7 @@ PF_table::PF_table(const double init_pos, QWidget *parent):
 
 //    main_widget->installEventFilter(this);
 
-    QSizePolicy policy(QSizePolicy::Preferred,QSizePolicy::Preferred);
+    QSizePolicy policy(QSizePolicy::MinimumExpanding,QSizePolicy::MinimumExpanding);
     policy.setHeightForWidth(true);
     this->setSizePolicy(policy);
 
@@ -74,7 +75,17 @@ int PF_table::heightForWidth(int w) const
 
 QSize PF_table::sizeHint() const
 {
-    return QSize(__widget_size__,__widget_size__);
+    return QSize(__widget_size__/2,__widget_size__/2);
+//    QSize sz = this->parentWidget()->size();
+//    int side;
+//    if ( sz.width() > sz.height() ) {
+//        side = sz.height();
+//    } else {
+//        side = sz.width();
+//    }
+
+//    qDebug() << side;
+//    return QSize(side, side);
 }
 
 
