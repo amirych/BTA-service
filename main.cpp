@@ -5,8 +5,8 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    BTA_service w;
-    w.show();
+    BTA_service *w = new BTA_service;
+    w->show();
 
 //    PF_table pp(210);
 

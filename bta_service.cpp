@@ -453,7 +453,7 @@ void BTA_service::setupUI()
     focussing_button = new QPushButton("focussing",focus_header_exit_buttons);
     header_button  = new QPushButton("edit header",focus_header_exit_buttons);
     app_exit_button = new QPushButton("EXIT",focus_header_exit_buttons);
-    connect(app_exit_button,SIGNAL(clicked(bool)),this,SLOT(deleteLater()));
+    connect(app_exit_button,SIGNAL(clicked()),this,SLOT(deleteLater()));
 
     focus_header_exit_buttons_layout->addWidget(focussing_button);
     focus_header_exit_buttons_layout->addWidget(header_button);
