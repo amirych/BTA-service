@@ -18,8 +18,10 @@ class QFitsHeaderEditor : public QWidget
 
 public:
     explicit QFitsHeaderEditor(QWidget *parent = nullptr);
-    QFitsHeaderEditor(QString fits_filename, QWidget *parent);
-    QFitsHeaderEditor(QString fits_filename, QStringList keynames, QWidget *parent);
+    QFitsHeaderEditor(QString fits_filename, QStringList keynames, QWidget *parent = nullptr);
+    QFitsHeaderEditor(QString fits_filename, QWidget *parent = nullptr);
+
+    ~QFitsHeaderEditor();
 
     int getCurrentError() const;
 

@@ -1,9 +1,14 @@
 #include "qfitsheadereditor.h"
 
+#include <QDebug>
 
 QFitsHeaderEditor::QFitsHeaderEditor(QString fits_filename, QStringList keynames, QWidget *parent): QWidget(parent),
     Fits_filename(""), Fits_file(NULL), currentError(QFITSHEADEREDITOR_ERROR_OK)
 {
+//    Fits_filename = "";
+//    Fits_file = NULL;
+//    currentError = QFITSHEADEREDITOR_ERROR_OK;
+
     if ( !fits_filename.isEmpty() ) {
         readFitsHeader(keynames);
     } else {
@@ -26,6 +31,11 @@ QFitsHeaderEditor::QFitsHeaderEditor(QWidget *parent): QFitsHeaderEditor("",pare
 
 }
 
+
+QFitsHeaderEditor::~QFitsHeaderEditor()
+{
+    qDebug() << "FITSHEADEREDITOR destructor";
+}
 
             /*    Public methods     */
 

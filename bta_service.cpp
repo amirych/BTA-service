@@ -33,7 +33,6 @@ BTA_service::BTA_service(QWidget *parent)
 
 BTA_service::~BTA_service()
 {
-
 }
 
 
@@ -99,11 +98,23 @@ void BTA_service::openFileInViewer()
 
     fits_viewer_widget->LoadFile(filename);
     if ( fits_viewer_widget->getCurrentError() != FITS_VIEWER_ERROR_OK) {
+        qDebug() << "fv: " << fits_viewer_widget->getCurrentError();
         // TODO ...
         return;
     }
 
     FITS_filename_label->setText(filename);
+
+    double lc,hc;
+
+    fits_viewer_widget->GetImageMinMax(&lc,&hc);
+    image_cuts_low->setRange(lc,hc);
+    image_cuts_high->setRange(lc,hc);
+
+    fits_viewer_widget->GetCurrentCuts(&lc,&hc);
+
+    showImageScaling(lc,hc);
+
 }
 
 
@@ -118,12 +129,14 @@ void BTA_service::showImageScaling(double low_cut, double high_cut)
 {
     double lc,hc;
 
-    fits_viewer_widget->GetImageMinMax(&lc,&hc);
-    image_cuts_low->setRange(lc,hc);
-    image_cuts_high->setRange(lc,hc);
+    disconnect(image_cuts_low,SIGNAL(valueChanged(double)),this,SLOT(changeImageScaling(double)));
+    disconnect(image_cuts_high,SIGNAL(valueChanged(double)),this,SLOT(changeImageScaling(double)));
 
     image_cuts_low->setValue(low_cut);
     image_cuts_high->setValue(high_cut);
+
+    connect(image_cuts_low,SIGNAL(valueChanged(double)),this,SLOT(changeImageScaling(double)));
+    connect(image_cuts_high,SIGNAL(valueChanged(double)),this,SLOT(changeImageScaling(double)));
 }
 
 
@@ -134,7 +147,12 @@ void BTA_service::changeImageScaling(double val)
     low_cut = image_cuts_low->value();
     hight_cut = image_cuts_high->value();
 
+    // to prevent loop for signals
+    disconnect(fits_viewer_widget,SIGNAL(ScalingIsChanged(double,double)),this,SLOT(showImageScaling(double,double)));
+
     fits_viewer_widget->ScaleImage(low_cut,hight_cut);
+
+    connect(fits_viewer_widget,SIGNAL(ScalingIsChanged(double,double)),this,SLOT(showImageScaling(double,double)));
 }
 
 
@@ -219,7 +237,6 @@ void BTA_service::setupUI()
     QDoubleValidator *seeing_val = new QDoubleValidator(0.0,20.0,1,seeing_widget);
     seeing_input_field->setValidator(seeing_val);
 
-    QSpacerItem *seeing_space = new QSpacerItem(30,10);
     clouds_label = new QLabel("clouds%",seeing_widget);
     clouds_input_field = new QLineEdit(seeing_widget);
     clouds_input_field->setAlignment(Qt::AlignRight);
@@ -228,9 +245,10 @@ void BTA_service::setupUI()
 
     seeing_layout->addWidget(seeing_label);
     seeing_layout->addWidget(seeing_input_field);
-    seeing_layout->addSpacerItem(seeing_space);
+    seeing_layout->addStretch(10);
     seeing_layout->addWidget(clouds_label);
     seeing_layout->addWidget(clouds_input_field);
+    seeing_layout->addStretch(0);
 
     current_file_layout->addWidget(seeing_widget);
 
@@ -267,7 +285,11 @@ void BTA_service::setupUI()
     file_layout->setMargin(0);
     current_file_label = new QLabel("file",file_widget);
     current_file_input_field = new QLineEdit(file_widget);
-    QSpacerItem *file_space = new QSpacerItem(30,10);
+    str = QString(BTA_SERVICE_FILE_MAX_CHARS,'0');
+    fn = current_file_input_field->font();
+    fnm = QFontMetrics(fn);
+    dw = fnm.width(str);
+    current_file_input_field->setMinimumWidth(dw);
     Nexp_label = new QLabel("N exp",file_widget);
 
     Nexp_input_field = new QLineEdit(file_widget);
@@ -282,9 +304,10 @@ void BTA_service::setupUI()
 
     file_layout->addWidget(current_file_label);
     file_layout->addWidget(current_file_input_field);
-    file_layout->addSpacerItem(file_space);
+    file_layout->addStretch(10);
     file_layout->addWidget(Nexp_label);
     file_layout->addWidget(Nexp_input_field);
+    file_layout->addStretch(0);
 
     current_file_layout->addWidget(file_widget);
 
@@ -430,6 +453,7 @@ void BTA_service::setupUI()
     focussing_button = new QPushButton("focussing",focus_header_exit_buttons);
     header_button  = new QPushButton("edit header",focus_header_exit_buttons);
     app_exit_button = new QPushButton("EXIT",focus_header_exit_buttons);
+    connect(app_exit_button,SIGNAL(clicked(bool)),this,SLOT(deleteLater()));
 
     focus_header_exit_buttons_layout->addWidget(focussing_button);
     focus_header_exit_buttons_layout->addWidget(header_button);
@@ -642,8 +666,8 @@ void BTA_service::setupUI()
 
     image_cuts_low = new QDoubleSpinBox(image_controls_widget);
     image_cuts_high = new QDoubleSpinBox(image_controls_widget);
-    connect(image_cuts_low,SIGNAL(valueChanged(double)),this,SLOT(changeImageScaling(double)));
-    connect(image_cuts_high,SIGNAL(valueChanged(double)),this,SLOT(changeImageScaling(double)));
+//    connect(image_cuts_low,SIGNAL(valueChanged(double)),this,SLOT(changeImageScaling(double)));
+//    connect(image_cuts_high,SIGNAL(valueChanged(double)),this,SLOT(changeImageScaling(double)));
 
     current_pixel_coords_label = new QLabel("Pixel: [0,0]",image_controls_widget);
     fn = current_pixel_coords_label->font();
