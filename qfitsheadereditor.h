@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QWidget>
+#include <QDialog>
 #include <QTableWidget>
 #include <QTableWidgetItem>
 #include <QPushButton>
@@ -12,14 +13,14 @@
 
 #define QFITSHEADEREDITOR_ERROR_OK 0
 
-class QFitsHeaderEditor : public QWidget
+class QFitsHeaderEditor : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit QFitsHeaderEditor(QWidget *parent = nullptr);
-    QFitsHeaderEditor(QString fits_filename, QStringList keynames, QWidget *parent = nullptr);
-    QFitsHeaderEditor(QString fits_filename, QWidget *parent = nullptr);
+    explicit QFitsHeaderEditor(QWidget *parent = nullptr, Qt::WindowFlags flag = 0);
+    QFitsHeaderEditor(QString fits_filename, QWidget *parent = nullptr, Qt::WindowFlags flag = 0);
+    QFitsHeaderEditor(QString fits_filename, QStringList keynames, QWidget *parent = nullptr, Qt::WindowFlags flag = 0);
 
     ~QFitsHeaderEditor();
 
@@ -38,6 +39,8 @@ private:
     fitsfile *Fits_file;
 
     int currentError;
+
+    QTableWidget *editor;
 
     QPushButton *load_file;
     QPushButton *cancel;
