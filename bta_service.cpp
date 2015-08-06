@@ -25,10 +25,15 @@ static QStringList binValues = QStringList({"1","2","3","4","5"});
                 /*      Constructors      */
 
 BTA_service::BTA_service(QWidget *parent)
-    : QMainWindow(parent)
+    : QMainWindow(parent), foc_dialog(nullptr)
 {
     setupUI();
 
+//    foc_dialog = new focussing_widget(88.5,92.5,0.5,this);
+
+    // connect UI signals
+
+    connect(focussing_button,SIGNAL(clicked()),this,SLOT(showFocussingDialog()));
 }
 
 BTA_service::~BTA_service()
@@ -154,6 +159,22 @@ void BTA_service::changeImageScaling(double val)
 
     connect(fits_viewer_widget,SIGNAL(ScalingIsChanged(double,double)),this,SLOT(showImageScaling(double,double)));
 }
+
+
+
+void BTA_service::showFocussingDialog()
+{
+    if ( foc_dialog != nullptr) delete foc_dialog;
+
+    foc_dialog = new focussing_widget;
+    foc_dialog->exec();
+    delete foc_dialog;
+    foc_dialog = nullptr;
+//    foc_dialog->show();
+//    foc_dialog->raise();
+//    foc_dialog->activateWindow();
+}
+
 
 
         /*     Private methods     */

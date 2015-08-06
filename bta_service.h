@@ -15,6 +15,7 @@
 
 #include "../fits_viewer/fits_viewer.h"
 #include "pf_table.h"
+#include "focussing_widget.h"
 
 
 #define BTA_SERVICE_NEXP_MAX_DIGITS 3
@@ -44,6 +45,8 @@ private slots:
     void showImagePoint(double xpos, double ypos, double val);
     void showImageScaling(double low_cut, double high_cut);
     void changeImageScaling(double val);
+
+    void showFocussingDialog();
 
 private:
     /*     Functions       */
@@ -195,6 +198,9 @@ private:
     QLineEdit *alpha_residual;
     QLineEdit *delta_residual;
 
+    // dialogs
+
+    focussing_widget *foc_dialog;
 };
 
 #endif // BTA_SERVICE_H

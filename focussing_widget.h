@@ -11,8 +11,10 @@
 class focussing_widget : public QDialog
 {
 public:
-    explicit focussing_widget(QWidget *parent = nullptr, Qt::WindowFlags f = 0);
-    focussing_widget(double start_value, double stop_value, double step_value, QWidget *parent = nullptr, Qt::WindowFlags f = 0);
+    explicit focussing_widget(QWidget *parent = 0, Qt::WindowFlags f = 0);
+    focussing_widget(double start_value, double stop_value, double step_value, QWidget *parent = 0, Qt::WindowFlags f = 0);
+
+    ~focussing_widget();
 
 private:
     void setupUI();

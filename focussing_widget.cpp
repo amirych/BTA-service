@@ -5,11 +5,14 @@
 #include <QString>
 #include <QFrame>
 
+#include <QDebug>
+
 focussing_widget::focussing_widget(double start_value, double stop_value, double step_value, QWidget *parent, Qt::WindowFlags f): QDialog(parent,f)
 {
-    this->setModal(false);
 
     setupUI();
+//    this->setModal(false);
+    this->setModal(true);
 
     start_focus_edit_field->setText(QString::number(start_value));
     stop_focus_edit_field->setText(QString::number(stop_value));
@@ -22,6 +25,13 @@ focussing_widget::focussing_widget(double start_value, double stop_value, double
 focussing_widget::focussing_widget(QWidget *parent, Qt::WindowFlags f): focussing_widget(0.0,0.0,0.0,parent,f)
 {
 
+}
+
+
+
+focussing_widget::~focussing_widget()
+{
+    qDebug() << "destr";
 }
 
 
@@ -40,8 +50,14 @@ void focussing_widget::setupUI()
 
     QFrame *ff = new QFrame(this);
     ff->setFixedSize(512,512);
+    ff->setFrameShape(QFrame::Box);
+    ff->setFrameShadow(QFrame::Plain);
+    QVBoxLayout *ffl = new QVBoxLayout(ff);
+    ffl->setAlignment(Qt::AlignHCenter);
+    ffl->setMargin(1);
 //    viewer = new Fits_viewer("",this);
     viewer = new Fits_viewer("",ff);
+    ffl->addWidget(viewer);
 //    viewer->setFixedSize(512,512);
 
 //    main_layout->addWidget(viewer);
@@ -64,6 +80,8 @@ void focussing_widget::setupUI()
     buttons_layout->addWidget(run_button);
     buttons_layout->addWidget(stop_button);
     buttons_layout->addWidget(quit_button);
+
+    connect(quit_button,SIGNAL(clicked()),this,SLOT(accept()));
 
     main_layout->addWidget(buttons_widget);
 
