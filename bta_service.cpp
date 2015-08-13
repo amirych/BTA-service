@@ -25,13 +25,19 @@ static QStringList binValues = QStringList({"1","2","3","4","5"});
                 /*      Constructors      */
 
 BTA_service::BTA_service(QWidget *parent)
-    : QMainWindow(parent), foc_dialog(nullptr)
+    : QMainWindow(parent), foc_dialog(nullptr),
+      currentFITS_filename(""),
+      isFocussingMode(false), currentSelectedRegion()
 {
     setupUI();
 
 //    foc_dialog = new focussing_widget(88.5,92.5,0.5,this);
 
     // connect UI signals
+
+    connect(fits_viewer_widget,SIGNAL(SelectedRegion(QRectF)),this,SLOT(setSelectedRegion(QRectF)));
+    connect(fits_viewer_widget,SIGNAL(DeselectRegion()),this,SLOT(setSelectedRegion()));
+    connect(plot_region_button,SIGNAL(clicked()),this,SLOT(plotRegion()));
 
     connect(focussing_button,SIGNAL(clicked()),this,SLOT(showFocussingDialog()));
 }
@@ -42,6 +48,7 @@ BTA_service::~BTA_service()
 
 
         /*     Private slots    */
+
 
 void BTA_service::changeFrameType(QString type)
 {
@@ -99,16 +106,16 @@ void BTA_service::openFileInViewer()
 
     if ( working_path.isEmpty() ) working_path = ".";
 
-    QString filename = QFileDialog::getOpenFileName(this,"Open FITS file ...",working_path,BTA_SERVICE_FITS_FILE_FILTER);
+    currentFITS_filename = QFileDialog::getOpenFileName(this,"Open FITS file ...",working_path,BTA_SERVICE_FITS_FILE_FILTER);
 
-    fits_viewer_widget->LoadFile(filename);
+    fits_viewer_widget->LoadFile(currentFITS_filename);
     if ( fits_viewer_widget->getCurrentError() != FITS_VIEWER_ERROR_OK) {
         qDebug() << "fv: " << fits_viewer_widget->getCurrentError();
         // TODO ...
         return;
     }
 
-    FITS_filename_label->setText(filename);
+    FITS_filename_label->setText(currentFITS_filename);
 
     double lc,hc;
 
@@ -173,6 +180,28 @@ void BTA_service::showFocussingDialog()
 //    foc_dialog->show();
 //    foc_dialog->raise();
 //    foc_dialog->activateWindow();
+}
+
+
+void BTA_service::setSelectedRegion(QRectF rect)
+{
+    currentSelectedRegion = rect.normalized();
+}
+
+
+void BTA_service::setSelectedRegion()
+{
+    currentSelectedRegion = QRectF();
+}
+
+void BTA_service::plotRegion()
+{
+    if ( currentSelectedRegion.isValid() ) {
+//        if ( currentSelectedRegion.isValid() && !currentSelectedRegion.isEmpty() ) {
+        plotRegion_dialog = new plot_region_widget(currentFITS_filename,currentSelectedRegion,this);
+        plotRegion_dialog->resize(500,300);
+        plotRegion_dialog->exec();
+    }
 }
 
 

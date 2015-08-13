@@ -12,10 +12,12 @@
 #include <QSlider>
 #include <QCheckBox>
 #include <QDoubleSpinBox>
+#include <QRectF>
 
 #include "../fits_viewer/fits_viewer.h"
 #include "pf_table.h"
 #include "focussing_widget.h"
+#include "plot_region_widget.h"
 
 
 #define BTA_SERVICE_NEXP_MAX_DIGITS 3
@@ -47,6 +49,10 @@ private slots:
     void changeImageScaling(double val);
 
     void showFocussingDialog();
+
+    void setSelectedRegion(QRectF rect);
+    void setSelectedRegion();
+    void plotRegion();
 
 private:
     /*     Functions       */
@@ -198,9 +204,20 @@ private:
     QLineEdit *alpha_residual;
     QLineEdit *delta_residual;
 
-    // dialogs
+
+
+            /*    Dialogs    */
 
     focussing_widget *foc_dialog;
+    plot_region_widget *plotRegion_dialog;
+
+
+            /*    Mode flags and state variables    */
+
+    QString currentFITS_filename;
+    bool isFocussingMode;
+    QRectF currentSelectedRegion;
+
 };
 
 #endif // BTA_SERVICE_H
