@@ -212,7 +212,6 @@ void BTA_service::setSelectedRegion()
 void BTA_service::plotRegion()
 {
     if ( currentSelectedRegion.isValid() ) {
-//        if ( currentSelectedRegion.isValid() && !currentSelectedRegion.isEmpty() ) {
         plotRegion_dialog = new plot_region_widget(currentFITS_filename,currentSelectedRegion,this);
         plotRegion_dialog->resize(500,300);
         plotRegion_dialog->exec();

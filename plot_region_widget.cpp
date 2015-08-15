@@ -55,6 +55,7 @@ void plot_region_widget::plotRegion(QString fits_filename, QRectF region)
     int fits_status = 0;
 
     double *data = nullptr;
+    double h,w;
     QVector<double> xdata,ydata;
 
     long fpixel[2] = {1,1};
@@ -66,8 +67,12 @@ void plot_region_widget::plotRegion(QString fits_filename, QRectF region)
     xl = qRound(region.x());
     yl = qRound(region.y());
 
-    xr = qRound(region.x() + region.width() - 1);
-    yr = qRound(region.y() + region.height() - 1);
+    // check for just pixel-wide region
+    w = (region.width() < 1) ? 1.0 : region.width();
+    h = (region.height() < 1) ? 1.0: region.height();
+
+    xr = qRound(region.x() + w - 1);
+    yr = qRound(region.y() + h - 1);
 
     LONGLONG Ncols = (xr-xl+1);
     LONGLONG Nrows = (yr-yl+1);
