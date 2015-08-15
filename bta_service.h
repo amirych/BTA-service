@@ -54,6 +54,8 @@ private slots:
     void setSelectedRegion();
     void plotRegion();
 
+    void showRegionStat();
+
 private:
     /*     Functions       */
 
@@ -157,6 +159,7 @@ private:
     QLabel *current_pixel_value_label;
     QPushButton *plot_region_button;
     QPushButton *region_stat_button;
+    QLabel *region_stat_label;
     QPushButton *region_centroid_button;
     QPushButton *seeing_button;
     QLabel *psf_coords_label;

@@ -56,7 +56,7 @@ void focussing_widget::setupUI()
     ffl->setAlignment(Qt::AlignHCenter);
     ffl->setMargin(1);
 //    viewer = new Fits_viewer("",this);
-    viewer = new Fits_viewer("",ff);
+    viewer = new Fits_viewer("/home/timur/zz10.fts",ff);
     ffl->addWidget(viewer);
 //    viewer->setFixedSize(512,512);
 

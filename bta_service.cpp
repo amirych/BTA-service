@@ -1,6 +1,7 @@
 #include "bta_service.h"
 
 #include <iostream>
+#include <algorithm>
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -21,6 +22,17 @@ static QStringList expTypeItems = QStringList({"obj","bias","dark","rotation"});
 static QStringList binValues = QStringList({"1","2","3","4","5"});
 
 
+                /*      Auxialiry functions     */
+
+// form string for region statistics
+static QString region_stat_string(double min, double max, double mean, double median, double stddev)
+{
+    QString str = "Min = " + QString::number(min) + "\nMax = " + QString::number(max) +
+                  "\nMean = " + QString::number(mean) + "\nMedian = " + QString::number(median) +
+                  "\nStddev = " + QString::number(stddev);
+    return str;
+}
+
 
                 /*      Constructors      */
 
@@ -38,6 +50,7 @@ BTA_service::BTA_service(QWidget *parent)
     connect(fits_viewer_widget,SIGNAL(SelectedRegion(QRectF)),this,SLOT(setSelectedRegion(QRectF)));
     connect(fits_viewer_widget,SIGNAL(DeselectRegion()),this,SLOT(setSelectedRegion()));
     connect(plot_region_button,SIGNAL(clicked()),this,SLOT(plotRegion()));
+    connect(region_stat_button,SIGNAL(clicked()), this,SLOT(showRegionStat()));
 
     connect(focussing_button,SIGNAL(clicked()),this,SLOT(showFocussingDialog()));
 }
@@ -127,6 +140,8 @@ void BTA_service::openFileInViewer()
 
     showImageScaling(lc,hc);
 
+    QString str = region_stat_string(0.0,0.0,0.0,0.0,0.0);
+    region_stat_label->setText(str);
 }
 
 
@@ -171,12 +186,12 @@ void BTA_service::changeImageScaling(double val)
 
 void BTA_service::showFocussingDialog()
 {
-    if ( foc_dialog != nullptr) delete foc_dialog;
+//    if ( foc_dialog != nullptr) delete foc_dialog;
 
-    foc_dialog = new focussing_widget;
+    foc_dialog = new focussing_widget(this);
     foc_dialog->exec();
-    delete foc_dialog;
-    foc_dialog = nullptr;
+//    delete foc_dialog;
+//    foc_dialog = nullptr;
 //    foc_dialog->show();
 //    foc_dialog->raise();
 //    foc_dialog->activateWindow();
@@ -202,6 +217,50 @@ void BTA_service::plotRegion()
         plotRegion_dialog->resize(500,300);
         plotRegion_dialog->exec();
     }
+}
+
+
+void BTA_service::showRegionStat()
+{
+    // compute statistics
+
+    QRect rect;
+
+    double *subImage = fits_viewer_widget->getCurrentSubImage(&rect);
+
+    if ( subImage == nullptr ) return;
+
+    long Npix = rect.width()*rect.height();
+//    qDebug() << "Npix: " << Npix;
+//    qDebug() << rect;
+
+    std::sort(subImage,subImage+Npix);
+
+    long cen = Npix/2;
+
+    double median = ( (Npix % 2) == 0) ? (subImage[cen] + subImage[cen-1])/2.0 : subImage[cen];
+
+    double mean = 0.0;
+    double stddev = 0.0;
+
+    for ( long i = 0; i < Npix; ++i ) {
+//        qDebug() << subImage[i];
+        mean += subImage[i];
+    }
+    mean /= Npix;
+
+    for ( long i = 0; i < Npix; ++i ) {
+        stddev += (subImage[i] - mean)*(subImage[i] - mean);
+    }
+    stddev = std::sqrt(stddev/(Npix-1));
+
+//    QString str = "Min = " + QString::number(subImage[0]) + "\nMax = " + QString::number(subImage[Npix-1]) +
+//                  "\nMean = " + QString::number(mean) + "\nMedian = " + QString::number(median) +
+//                  "\nStddev = " + QString::number(stddev);
+
+    QString str = region_stat_string(subImage[0],subImage[Npix-1],mean,median,stddev);
+
+    region_stat_label->setText(str);
 }
 
 
@@ -727,7 +786,10 @@ void BTA_service::setupUI()
 
     current_pixel_value_label = new QLabel("Value: 0.0",image_controls_widget);
     plot_region_button = new QPushButton("plot region",image_controls_widget);
+
     region_stat_button = new QPushButton(" region statistics ",image_controls_widget);
+    region_stat_label = new QLabel(region_stat_string(0.0,0.0,0.0,0.0,0.0),image_controls_widget);
+
     region_centroid_button = new QPushButton(" region centroid ",image_controls_widget);
     seeing_button = new QPushButton("seeing",image_controls_widget);
     psf_coords_label = new QLabel("X: 0.0, Y: 0.0",image_controls_widget);
@@ -741,6 +803,8 @@ void BTA_service::setupUI()
     image_controls_layout->addStretch(1);
     image_controls_layout->addWidget(plot_region_button);
     image_controls_layout->addWidget(region_stat_button);
+    image_controls_layout->addWidget(region_stat_label);
+    image_controls_layout->addStretch(1);
     image_controls_layout->addWidget(region_centroid_button);
     image_controls_layout->addWidget(seeing_button);
     image_controls_layout->addWidget(psf_coords_label);

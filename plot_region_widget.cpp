@@ -61,6 +61,8 @@ void plot_region_widget::plotRegion(QString fits_filename, QRectF region)
 
     int xl,xr,yl,yr;
 
+    // region is in FITS pixel notation!!! (starting from [1,1])
+
     xl = qRound(region.x());
     yl = qRound(region.y());
 
