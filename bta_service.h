@@ -18,6 +18,7 @@
 #include "pf_table.h"
 #include "focussing_widget.h"
 #include "plot_region_widget.h"
+#include "psf_dialog.h"
 
 
 #define BTA_SERVICE_NEXP_MAX_DIGITS 3
@@ -55,6 +56,7 @@ private slots:
     void plotRegion();
 
     void showRegionStat();
+    void showPSF();
 
 private:
     /*     Functions       */
@@ -213,6 +215,7 @@ private:
 
     focussing_widget *foc_dialog;
     plot_region_widget *plotRegion_dialog;
+    psf_dialog *showPSF_dialog;
 
 
             /*    Mode flags and state variables    */

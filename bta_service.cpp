@@ -52,6 +52,8 @@ BTA_service::BTA_service(QWidget *parent)
     connect(plot_region_button,SIGNAL(clicked()),this,SLOT(plotRegion()));
     connect(region_stat_button,SIGNAL(clicked()), this,SLOT(showRegionStat()));
 
+    connect(seeing_button,SIGNAL(clicked()), this, SLOT(showPSF()));
+
     connect(focussing_button,SIGNAL(clicked()),this,SLOT(showFocussingDialog()));
 }
 
@@ -260,6 +262,14 @@ void BTA_service::showRegionStat()
     QString str = region_stat_string(subImage[0],subImage[Npix-1],mean,median,stddev);
 
     region_stat_label->setText(str);
+}
+
+
+void BTA_service::showPSF()
+{
+    showPSF_dialog = new psf_dialog(currentFITS_filename,currentSelectedRegion,this);
+    showPSF_dialog->resize(700,500);
+    showPSF_dialog->exec();
 }
 
 
