@@ -2,7 +2,7 @@
 #define PSF_DEFS_H
 
 #define MOFFAT2D_NPARS 8
-#define FITTING_MAX_ITER 1000
+#define FITTING_MAX_ITER 100
 
 typedef double moffat2d_params[MOFFAT2D_NPARS];
 typedef double moffat2d_lower_bounds[MOFFAT2D_NPARS];

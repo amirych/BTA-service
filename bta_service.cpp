@@ -121,7 +121,10 @@ void BTA_service::openFileInViewer()
 
     if ( working_path.isEmpty() ) working_path = ".";
 
-    currentFITS_filename = QFileDialog::getOpenFileName(this,"Open FITS file ...",working_path,BTA_SERVICE_FITS_FILE_FILTER);
+    QString filename = QFileDialog::getOpenFileName(this,"Open FITS file ...",working_path,BTA_SERVICE_FITS_FILE_FILTER);
+    if ( filename.trimmed().isEmpty() ) return; // Cancel button was clicked
+
+    currentFITS_filename = filename.trimmed();
 
     fits_viewer_widget->LoadFile(currentFITS_filename);
     if ( fits_viewer_widget->getCurrentError() != FITS_VIEWER_ERROR_OK) {
@@ -268,10 +271,20 @@ void BTA_service::showRegionStat()
 void BTA_service::showPSF()
 {
     showPSF_dialog = new psf_dialog(currentFITS_filename,currentSelectedRegion,this);
+    connect(showPSF_dialog,SIGNAL(psfComputed(moffat2d_params)), this, SLOT(showPsfParams(moffat2d_params)),
+            Qt::BlockingQueuedConnection);
     showPSF_dialog->resize(700,500);
-    showPSF_dialog->exec();
+//    showPSF_dialog->exec();
+    showPSF_dialog->show();
 }
 
+
+void BTA_service::showPsfParams(moffat2d_params pars)
+{
+    qDebug() << "PSF computed!";
+    psf_coords_label->setText("X: " + QString::number(pars[1],'g',1) + ", Y: " + QString::number(pars[2],'g',1));
+    psf_fwhm_label->setText("FWHM: " + QString::number((pars[3] + pars[4])/2.0,'g',1));
+}
 
 
         /*     Private methods     */
@@ -280,6 +293,8 @@ void BTA_service::setupUI()
 {
     QString str;
     int dw;
+
+    this->setWindowTitle("BTA service tools");
 
     central_widget = new QFrame(this);
     this->setCentralWidget(central_widget);
@@ -800,7 +815,7 @@ void BTA_service::setupUI()
     region_stat_label = new QLabel(region_stat_string(0.0,0.0,0.0,0.0,0.0),image_controls_widget);
 
     region_centroid_button = new QPushButton(" region centroid ",image_controls_widget);
-    seeing_button = new QPushButton("seeing",image_controls_widget);
+    seeing_button = new QPushButton("PSF fitting",image_controls_widget);
     psf_coords_label = new QLabel("X: 0.0, Y: 0.0",image_controls_widget);
     psf_fwhm_label = new QLabel("FWHM: 0.0",image_controls_widget);
 

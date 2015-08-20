@@ -5,6 +5,7 @@
 
 #include "levmar.h"
 
+#include <QDebug>
 
 using namespace std;
 
@@ -52,12 +53,13 @@ void moffat2d(double *pars, double *func, int n_pars, int n_func, void* data)
     double k,r2,xp,yp;
     moffat2d_data *xy = (moffat2d_data*) data;
 
+    if ( n_pars < MOFFAT2D_NPARS ) return;
+
     if ( xy->Nx*xy->Ny != n_func ) return;
 
     double phi = pars[6]/180.0*M_PI;
 
     k = 4.0*(pow(2,1.0/pars[5])-1.0);
-
 
     std::size_t l = 0;
     for ( std::size_t i = 0; i < xy->Ny; ++i ) {
@@ -69,12 +71,13 @@ void moffat2d(double *pars, double *func, int n_pars, int n_func, void* data)
             xp = xx*cos(phi) - y1;
             yp = y2 + xx*sin(phi);
 
-            r2 = pow((xp-pars[1])/pars[3],2) + pow((yp-pars[2])/pars[4],2);
+            r2 = pow(xp/pars[3],2) + pow(yp/pars[4],2);
 
             func[l] = pars[0]*pow(1.0+k*r2,-pars[5]) + pars[7];
             ++l;
         }
     }
+
 }
 
 moffat2d_data* init_moffat2d_data(std::size_t Nx, std::size_t Ny)
@@ -111,10 +114,12 @@ void free_moffat2d_data(moffat2d_data *data)
 int fit_psf(double *data, std::size_t Ndata, double start_x, double start_y, std::size_t Nx, std::size_t Ny,
             moffat2d_lower_bounds lb,
             moffat2d_upper_bounds ub,
-            moffat2d_params pars)
+            double* pars)
+//            moffat2d_params pars)
 {
     moffat2d_data *md = nullptr;
     double *work_space = nullptr;
+    double info[LM_INFO_SZ];
 
     int ret;
 
@@ -134,11 +139,13 @@ int fit_psf(double *data, std::size_t Ndata, double start_x, double start_y, std
             md->y[i] = start_y + i;
         }
 
-        ret = dlevmar_bc_dif(moffat2d,pars,data,MOFFAT2D_NPARS,Ndata,lb,ub,NULL,FITTING_MAX_ITER,NULL,NULL,work_space,NULL,(void*)md);
+//        ret = dlevmar_bc_dif(moffat2d,pars,data,MOFFAT2D_NPARS,Ndata,lb,ub,NULL,FITTING_MAX_ITER,NULL,NULL,work_space,NULL,(void*)md);
+        ret = dlevmar_bc_dif(moffat2d,pars,data,MOFFAT2D_NPARS,Ndata,lb,ub,NULL,FITTING_MAX_ITER,NULL,info,work_space,NULL,(void*)md);
 
         delete[] work_space;
         free_moffat2d_data(md);
 
+        if ( info[6] == 7 ) return -200; // Nan or Inf func value!!!
         return ret;
     } catch (std::bad_alloc &ex) {
         delete[] work_space;
