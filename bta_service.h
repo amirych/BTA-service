@@ -58,7 +58,7 @@ private slots:
 
     void showRegionStat();
     void showPSF();
-    void showPsfParams(moffat2d_params pars);
+    void showCentroidParams();
 
 private:
     /*     Functions       */

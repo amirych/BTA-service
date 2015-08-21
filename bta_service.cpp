@@ -48,11 +48,16 @@ BTA_service::BTA_service(QWidget *parent)
     // connect UI signals
 
     connect(fits_viewer_widget,SIGNAL(SelectedRegion(QRectF)),this,SLOT(setSelectedRegion(QRectF)));
+
     connect(fits_viewer_widget,SIGNAL(DeselectRegion()),this,SLOT(setSelectedRegion()));
+
     connect(plot_region_button,SIGNAL(clicked()),this,SLOT(plotRegion()));
+
     connect(region_stat_button,SIGNAL(clicked()), this,SLOT(showRegionStat()));
 
     connect(seeing_button,SIGNAL(clicked()), this, SLOT(showPSF()));
+
+    connect(region_centroid_button,SIGNAL(clicked()), this, SLOT(showCentroidParams()));
 
     connect(focussing_button,SIGNAL(clicked()),this,SLOT(showFocussingDialog()));
 }
@@ -271,19 +276,62 @@ void BTA_service::showRegionStat()
 void BTA_service::showPSF()
 {
     showPSF_dialog = new psf_dialog(currentFITS_filename,currentSelectedRegion,this);
-    connect(showPSF_dialog,SIGNAL(psfComputed(moffat2d_params)), this, SLOT(showPsfParams(moffat2d_params)),
-            Qt::BlockingQueuedConnection);
+
+    moffat2d_params fit_pars;
+    showPSF_dialog->getFitParams(fit_pars);
+
+    psf_coords_label->setText("X: " + QString::number(fit_pars[1],'f',1) + ", Y: " + QString::number(fit_pars[2],'f',1));
+    psf_fwhm_label->setText("FWHM: " + QString::number((fit_pars[3] + fit_pars[4])/2.0,'f',1));
+
     showPSF_dialog->resize(700,500);
 //    showPSF_dialog->exec();
     showPSF_dialog->show();
 }
 
 
-void BTA_service::showPsfParams(moffat2d_params pars)
+void BTA_service::showCentroidParams()
 {
-    qDebug() << "PSF computed!";
-    psf_coords_label->setText("X: " + QString::number(pars[1],'g',1) + ", Y: " + QString::number(pars[2],'g',1));
-    psf_fwhm_label->setText("FWHM: " + QString::number((pars[3] + pars[4])/2.0,'g',1));
+    QRect rect;
+
+    double *subImage = fits_viewer_widget->getCurrentSubImage(&rect);
+
+    if ( subImage == nullptr ) return;
+
+//    long Npix = rect.width()*rect.height();
+
+    double xc = 0.0, yc = 0.0, sum = 0.0, x2 = 0.0, y2 = 0.0;
+
+
+    for ( size_t x = 0; x < rect.width(); ++x ) {
+        for ( size_t y = 0; y < rect.height(); ++y ) {
+            double I = subImage[y*rect.width() + x];
+            xc += x*I;
+            yc += y*I;
+            x2 += x*x*I;
+            y2 += y*y*I;
+            sum += I;
+        }
+    }
+
+    xc /= sum;
+    yc /= sum;
+
+    x2 /= sum;
+    y2 /= sum;
+
+    xc += rect.x();
+    yc += rect.y();
+
+    sum = rect.width()/2.0;
+    x2 -= sum*sum;
+    x2 = sqrt(x2);
+
+    sum = rect.height()/2.0;
+    y2 -= sum*sum;
+    y2 = sqrt(y2);
+
+    psf_coords_label->setText("X: " + QString::number(xc,'f',1) + ", Y: " + QString::number(yc,'f',1));
+    psf_fwhm_label->setText("FWHM: " + QString::number((x2+y2)/2.0,'f',1));
 }
 
 

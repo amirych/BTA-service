@@ -21,6 +21,7 @@ public:
     psf_dialog(QString fits_filename, QRectF region, QWidget *parent = nullptr, Qt::WindowFlags f = 0);
 
     void plot_psf(QString fits_filename, QRectF region);
+    void getFitParams(moffat2d_params);
 
 signals:
     void psfComputed(moffat2d_params pars);
@@ -28,6 +29,8 @@ signals:
 private:
     void setupUi();
     QString formatResults(moffat2d_params fit_pars);
+
+    moffat2d_params fit_pars;
 
     QCustomPlot *customPlot;
     QCPGraph *x_graph_data;

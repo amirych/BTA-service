@@ -35,7 +35,7 @@ void psf_dialog::plot_psf(QString fits_filename, QRectF region)
 
     moffat2d_lower_bounds lc = {0.0,-100.0,-100.0,1.0,1.0,1.0,0.0,0.0};
     moffat2d_upper_bounds uc = {1.0E14,5000.0,5000.0,20.0,20.0,10.0,360.0,1.0E14};
-    moffat2d_params pars;
+//    moffat2d_params pars;
 
     double h,w;
     QVector<double> xdataX,ydataX,yfitX;
@@ -100,33 +100,31 @@ void psf_dialog::plot_psf(QString fits_filename, QRectF region)
 
         auto min_el = std::min_element(data,data+nelem);
         auto max_el = std::max_element(data,data+nelem);
-        pars[0] = *max_el - *min_el;        
-        pars[7] = (*min_el >= 0) ? *min_el : 0.0;
-//        pars[1] = (xr+xl)/2.0;
-        pars[1] = ((max_el - data) % Ncols) + xl;
-//        pars[2] = (yr+yl)/2.0;
-        pars[2] = ((max_el - data) / Ncols) + yl;
-        pars[3] = pars[4] = 3.0;
-        pars[5] = 2.5;
-        pars[6] = 0.0;
+        fit_pars[0] = *max_el - *min_el;
+        fit_pars[7] = (*min_el >= 0) ? *min_el : 0.0;
+        fit_pars[1] = ((max_el - data) % Ncols) + xl;
+        fit_pars[2] = ((max_el - data) / Ncols) + yl;
+        fit_pars[3] = fit_pars[4] = 3.0;
+        fit_pars[5] = 2.5;
+        fit_pars[6] = 0.0;
 
-        qDebug() << "PEAK: " << pars[1] << pars[2];
+        qDebug() << "PEAK: " << fit_pars[1] << fit_pars[2];
 
-        int ret = fit_psf(data,nelem,xl,yl,Ncols,Nrows,lc,uc,pars);
+        int ret = fit_psf(data,nelem,xl,yl,Ncols,Nrows,lc,uc,fit_pars);
 
         qDebug() << "FIT: " << ret;
 
         if ( ret > 0 ) {
-            emit psfComputed(pars);
+//            emit psfComputed(pars);
 
-            comp_moffat2d(xl,yl,Ncols,Nrows,pars,fitted_data);
+            comp_moffat2d(xl,yl,Ncols,Nrows,fit_pars,fitted_data);
 
             // get slicers
-            int xc = qRound(pars[1]-xl);
+            int xc = qRound(fit_pars[1]-xl);
             if ( xc < 0 ) xc = 0;
             if ( xc >= Ncols ) xc = Ncols-1;
 
-            int yc = qRound(pars[2]-yl);
+            int yc = qRound(fit_pars[2]-yl);
             if ( yc < 0 ) yc = 0;
             if ( yc >= Nrows ) yc = Nrows-1;
 
@@ -139,7 +137,7 @@ void psf_dialog::plot_psf(QString fits_filename, QRectF region)
                 y = fitted_data[yc*Ncols + i];
                 yfitX[i] = y;
             }
-            for ( int i = 0; i < MOFFAT2D_NPARS; ++i ) qDebug() << pars[i];
+            for ( int i = 0; i < MOFFAT2D_NPARS; ++i ) qDebug() << fit_pars[i];
             x_graph_data->setData(xdataX,ydataX);
             x_graph_fit->setData(xdataX,yfitX);
             x_graph_data->rescaleAxes();
@@ -160,7 +158,7 @@ void psf_dialog::plot_psf(QString fits_filename, QRectF region)
             y_graph_fit->setData(xdataY,yfitY);
             y_graph_fit->rescaleAxes();
 
-            QString str = formatResults(pars);
+            QString str = formatResults(fit_pars);
             result_label->setText(str);
         } else {
             result_label->setText("Cannot fit the data!");
@@ -178,6 +176,11 @@ void psf_dialog::plot_psf(QString fits_filename, QRectF region)
     }
 }
 
+
+void psf_dialog::getFitParams(moffat2d_params pars)
+{
+    for (int i = 0; i < MOFFAT2D_NPARS; ++i ) pars[i] = fit_pars[i];
+}
 
             /*      Private methods     */
 
